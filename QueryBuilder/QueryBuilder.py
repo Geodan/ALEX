@@ -2,8 +2,25 @@ import flask
 from wit import Wit
 import logging
 
+import .config
+
+def say(session_id, context, msg):
+    print(msg)
+
+def merge(session_id, context, entities, msg):
+    return context
+
+def error(session_id, context, e):
+    print(str(e))
+
+actions = {
+    'say': say,
+    'merge': merge,
+    'error': error,
+}
+
 app = flask.Flask(__name__)
-client = Wit(token, actions)
+client = Wit(config.wit_token, actions)
 
 @app.route("/")
 def index():
