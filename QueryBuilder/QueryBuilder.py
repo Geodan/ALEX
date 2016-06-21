@@ -2,7 +2,7 @@ import flask
 from wit import Wit
 import logging
 
-import .config
+import config
 
 def say(session_id, context, msg):
     print(msg)
@@ -42,10 +42,12 @@ def query():
 
     if flask.request.method == 'POST':
         json_data = flask.request.get_json(force=True)
-        print(json_data)
         if not json_data["sentence"]:
             return flask.jsonify({})
-        return flask.jsonify({'result': "Success"})
+        resp = client.converse('geobot-session-1', json_data["sentence"], {})
+        print(resp)
+        return flask.jsonify(resp)
+
 
 
     else:
