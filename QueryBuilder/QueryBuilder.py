@@ -8,7 +8,10 @@ def say(session_id, context, msg):
     print(msg)
 
 def merge(session_id, context, entities, msg):
-    return context
+    print("Session id", session_id)
+    print("Context", context)
+    print("entities", entities)
+    print("msg",  msg)
 
 def error(session_id, context, e):
     print(str(e))
@@ -39,7 +42,7 @@ def query():
         A JSON array containing the geodata when successful. An empty array
         when not successful.
     """
-
+    location = (52.3426354, 4.9127781)
     if flask.request.method == 'POST':
         json_data = flask.request.get_json(force=True)
         if not json_data["sentence"]:
@@ -62,14 +65,8 @@ def query():
 
         sentence = json_data["sentence"].lower().strip()
 
-
-        command = None
-        search = []
-        logic = []
-        conditionals = []
-        filter = []
-        arguments = []
-
+        ordered_sentence = []
+        query = []
 
         top_confidence = 0
         for c in resp["entities"]["command"]:
@@ -78,52 +75,100 @@ def query():
                 command = c["value"]
 
         counter = 0
-        while len(sentence) > 0:
+        tries = 0
 
+        while len(sentence) > 0:
+            tries += 1
             for type in resp["entities"]:
                 for word_info in resp["entities"][type]:
                     word = str(word_info["value"]).lower()
                     try:
                         if sentence.index(word) == 0:
+                            tries = 0
                             sentence = sentence.replace(word, "", 1).strip()
 
-                            if type == "search_query":
-                                print("Search", word)
-                                search.append((counter, word))
-                            elif type == "filter":
-                                filter.append((counter, word))
-                            elif type == "distance":
-                                arguments.append((counter, (word, word_info["unit"])))
-                            elif type == "logic_operator":
-                                logic.append((counter, word))
-                            elif type == "location":
-                                arguments.append((counter, word))
+                            ordered_sentence.append((word, type, word_info))
 
                             counter += 1
                             if type == "distance":
-                                sentence = sentence[sentence.find(' '):].strip()
-                                if sentence.find(' ') < 0:
-                                    sentence = ''
-                                    break
-
+                                sentence = trim_next_word_off_sentence(sentence) #remove unit
+                                break
                     except ValueError as e:
                         pass
 
+            if tries == 3:
+                counter += 1
+                ordered_sentence.append((word, "unknown", {}))
+                sentence = trim_next_word_off_sentence(sentence)
+                tries = 0
+
             print("Sentence left: ", sentence)
-        print("Done :)")
+            print("Tries left", tries)
+
 
         flask_response = {
-            'command': command,
-            'search': search,
-            'logic': logic,
-            'filter': filter,
-            'conditionals': conditionals,
-            'arguments': arguments
+            'nlp_result': ordered_sentence,
+            'query': sentence_to_query(ordered_sentence, location)
         }
         return flask.jsonify(flask_response)
 
     else:
-        return flask.render_template("query.html")
+        return flask.render_template("index.html")
+
+def trim_next_word_off_sentence(sentence):
+
+    """
+    Removes the next word from the given string.
+
+    :returns data:
+        A string with the next word removed. Empty string when there is only
+        one word.
+    """
+
+
+    sentence = sentence[sentence.strip().find(' '):].strip()
+    if sentence.find(' ') < 0:
+        sentence = ''
+    return sentence
+
+def convert_distance_units_to_meters(dist_obj):
+    if dist_obj["unit"] == "kilometre":
+        return dist_obj["value"] * 1000
+
+
+    return dist_obj["value"]
+# Very basic mapping atm
+def sentence_to_query(sentence, location=None):
+
+    query = "SELECT * FROM "
+    last_type = None
+    for word, type, word_info in sentence:
+        if type == "search_query":
+            query += word
+        elif type == "logic_operator":
+            if last_type == "search_query":
+                query += ","
+            else:
+                query += " "
+                query += word.upper()
+                query += " "
+        elif type == "filter":
+            if last_type == "search_query":
+                query += " WHERE "
+            distance_within_filter = ["within", "in a radius of"]
+            if word in distance_within_filter:
+                query += "ST_Distance_Sphere(geom, ST_MakePoint("
+                query += str(location[0]) + ","
+                query += str(location[1])
+                query += ")) < "
+
+        elif type == "distance":
+            query += str(convert_distance_units_to_meters(word_info))
+
+        last_type = type
+
+    return query + ";"
+
 
 
 if __name__ == "__main__":
