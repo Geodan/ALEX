@@ -22,8 +22,6 @@ if __name__ == "__main__":
         headers = {'content-type': 'application/json'}
 
         response = requests.post(url, data=json.dumps(payload), headers=headers)
-
-        print()
         bot.reply_to(message, response.content.decode("utf-8"))
 
 
