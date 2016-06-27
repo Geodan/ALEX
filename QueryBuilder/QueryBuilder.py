@@ -1,8 +1,8 @@
 import flask
-from wit import Wit
 import logging
 import config
 import requests
+from wit import Wit
 
 def say(session_id, context, msg):
     print(msg)
@@ -52,13 +52,13 @@ def query():
         print(resp)
 
         if "command" not in resp["entities"]:
-            return flask.jsonify({}) #What do I have to do with the the result?
+            return flask.jsonify({'error': 'No command given'}) #What do I have to do with the the result?
 
         if "search_query" not in resp["entities"]:
-            return flask.jsonify({}) #What do I have to search?
+            return flask.jsonify({'error': 'No search query given'}) #What do I have to search?
 
         if "filter" not in resp["entities"]:
-            return flask.jsonify({}) #How do I limit the results?
+            return flask.jsonify({'error': 'No filter given'}) #How do I limit the results?
 
         sentence = json_data["sentence"].lower().strip()
 
