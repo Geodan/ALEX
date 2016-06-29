@@ -3,6 +3,13 @@ import logging
 import config
 import requests
 from wit import Wit
+from pg import DB
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+english_stopwords = set(stopwords.words('english'))
+
+db = DB(dbname='gis', host='localhost', port=5432)
 
 def say(session_id, context, msg):
     print(msg)
@@ -105,10 +112,16 @@ def query():
             print("Sentence left: ", sentence)
             print("Tries left", tries)
 
+        query = nlp_result_to_query(ordered_sentence, location)
+        result = str(db.query(query).getresult())
+        result = (result[:75] + '..') if len(result) > 75 else result
+        # result = []
+
 
         flask_response = {
-            'nlp_result': ordered_sentence,
-            'query': sentence_to_query(ordered_sentence, location)
+            #'nlp_result': ordered_sentence,
+            'query': query,
+            'result': result
         }
         return flask.jsonify(flask_response)
 
@@ -137,37 +150,84 @@ def convert_distance_units_to_meters(dist_obj):
 
 
     return dist_obj["value"]
+
 # Very basic mapping atm
-def sentence_to_query(sentence, location=None):
+def nlp_result_to_query(sentence, location=None):
+
+    wnl = WordNetLemmatizer()
+
+    started_with_filter = False
+    attributes_to_get = None #attribute: name, toll, etc
+    type_to_get = []
+    database = None
 
     query = "SELECT * FROM "
     last_type = None
     for word, type, word_info in sentence:
-        if type == "search_query":
-            query += word
+
+        if type == "attribute":
+            word = list(filter(lambda w: not w in english_stopwords, word.split()))[0]
+            print(word)
+            if not attributes_to_get:
+                attributes_to_get = word
+            else:
+                attributes_to_get += word
+        elif type == "search_query":
+            lemma = wnl.lemmatize(word, 'n')
+            if lemma == "road":
+                database = "planet_osm_lines"
+            else:
+                database = "planet_osm_polygon"
+            type_to_get.append(word)
         elif type == "logic_operator":
-            if last_type == "search_query":
+            if last_type == "attribute":
                 query += ","
             else:
-                query += " "
-                query += word.upper()
-                query += " "
+                if started_with_filter:
+                    query += " "
+                    query += word.upper()
+                    query += " "
         elif type == "filter":
             if last_type == "search_query":
-                query += " WHERE "
+                if not started_with_filter:
+                    query += database
+                    query += " WHERE "
+                else:
+                    query += " AND "
             distance_within_filter = ["within", "in a radius of"]
             if word in distance_within_filter:
-                query += "ST_Distance_Sphere(geom, ST_MakePoint("
+                query += "ST_Distance_Sphere(st_transform(way, 4326), ST_MakePoint("
                 query += str(location[0]) + ","
                 query += str(location[1])
                 query += ")) < "
+            started_with_filter = True
 
         elif type == "distance":
             query += str(convert_distance_units_to_meters(word_info))
 
         last_type = type
 
-    return query + ";"
+    # """
+    # WITH buf AS (
+    #     SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(4.9127781,52.3426354), 4326), 3857), 5000) geom
+    # )
+    # SELECT name FROM planet_osm_polygon, buf
+    # WHERE way IS NOT NULL AND
+    #     NOT ST_IsEmpty(way) AND
+    #     ST_Intersects(way, buf.geom)
+    #     AND amenity LIKE '%hospital%';
+    # """
+
+    if started_with_filter:
+        query += " and ("
+    first = True
+    for search in type_to_get:
+        if not first:
+            query += " or "
+        query += " amenity LIKE '%" + wnl.lemmatize(search, 'n') + "%'"
+        first = False
+
+    return query + ") and name is not null limit 10 sort by ;"
 
 
 
