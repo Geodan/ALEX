@@ -8,9 +8,11 @@ if __name__ == "__main__":
         token = token_file.read()
     bot = telebot.TeleBot(token.strip())
 
-
     @bot.message_handler(commands=['query'])
     def query(message):
+        print(message.chat)
+        bot.send_chat_action(message.chat.id, 'find_location')
+
         arguments = message.text.split(" ")
 
         if len(arguments) < 2:
