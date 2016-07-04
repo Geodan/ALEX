@@ -227,7 +227,7 @@ def nlp_result_to_query(sentence, location=None):
         query += " amenity LIKE '%" + wnl.lemmatize(search, 'n') + "%'"
         first = False
 
-    return query + ") and name is not null limit 10 sort by ;"
+    return query + ") and name is not null limit 10;"
 
 
 
