@@ -56,7 +56,7 @@ def query():
         if not json_data["sentence"]:
             return flask.jsonify({})
         try:
-            resp = client.converse('geobot-session-1', json_data["sentence"], {})
+            resp = client.converse('geobot-session-2', json_data["sentence"], {})
         except:
             return flask.jsonify({'error':'Wit returned an error'})
 
@@ -71,43 +71,18 @@ def query():
         if "filter" not in resp["entities"]:
             return flask.jsonify({'error': 'No filter given'}) #How do I limit the results?
 
-        # query = nlp_result_to_query(ordered_sentence, location)
-        # result = str(db.query(query).getresult())
-        # result = (result[:75] + '..') if len(result) > 75 else result
-
         original_sentence = json_data["sentence"].lower().strip()
 
         flask_response = {
-            'sentence': Sentence(original_sentence, resp).ordered_sentence
+            # 'sentence': Sentence(original_sentence, resp).ordered_sentence,
+            'nlp': [str(t) for t in Sentence(original_sentence, resp).nlp_parts]
         }
         return flask.jsonify(flask_response)
-
 
     else:
         return flask.render_template("index.html")
 
-def trim_next_word_off_sentence(sentence):
 
-    """
-    Removes the next word from the given string.
-
-    :returns data:
-        A string with the next word removed. Empty string when there is only
-        one word.
-    """
-
-
-    sentence = sentence[sentence.strip().find(' '):].strip()
-    if sentence.find(' ') < 0:
-        sentence = ''
-    return sentence
-
-def convert_distance_units_to_meters(dist_obj):
-    if dist_obj["unit"] == "kilometre":
-        return dist_obj["value"] * 1000
-
-
-    return dist_obj["value"]
 
 # Very basic mapping atm
 def nlp_result_to_query(sentence, location=None):
