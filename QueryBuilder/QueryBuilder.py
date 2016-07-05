@@ -2,6 +2,7 @@ import flask
 import logging
 import config
 import requests
+from Sentence import Sentence
 from wit import Wit
 from pg import DB
 from nltk.corpus import stopwords
@@ -64,66 +65,23 @@ def query():
         if "command" not in resp["entities"]:
             return flask.jsonify({'error': 'No command given'}) #What do I have to do with the the result?
 
-        if "search_query" not in resp["entities"]:
+        if "local_search_query" not in resp["entities"]:
             return flask.jsonify({'error': 'No search query given'}) #What do I have to search?
 
         if "filter" not in resp["entities"]:
             return flask.jsonify({'error': 'No filter given'}) #How do I limit the results?
 
-        sentence = json_data["sentence"].lower().strip()
+        # query = nlp_result_to_query(ordered_sentence, location)
+        # result = str(db.query(query).getresult())
+        # result = (result[:75] + '..') if len(result) > 75 else result
 
-        ordered_sentence = []
-        query = []
-
-        top_confidence = 0
-        for c in resp["entities"]["command"]:
-            if c["confidence"] > top_confidence:
-                top_confidence = c["confidence"]
-                command = c["value"]
-
-        counter = 0
-        tries = 0
-
-        while len(sentence) > 0:
-            tries += 1
-            for type in resp["entities"]:
-                for word_info in resp["entities"][type]:
-                    word = str(word_info["value"]).lower()
-                    try:
-                        if sentence.index(word) == 0:
-                            tries = 0
-                            sentence = sentence.replace(word, "", 1).strip()
-
-                            ordered_sentence.append((word, type, word_info))
-
-                            counter += 1
-                            if type == "distance":
-                                sentence = trim_next_word_off_sentence(sentence) #remove unit
-                                break
-                    except ValueError as e:
-                        pass
-
-            if tries == 3:
-                counter += 1
-                ordered_sentence.append((word, "unknown", {}))
-                sentence = trim_next_word_off_sentence(sentence)
-                tries = 0
-
-            print("Sentence left: ", sentence)
-            print("Tries left", tries)
-
-        query = nlp_result_to_query(ordered_sentence, location)
-        result = str(db.query(query).getresult())
-        result = (result[:75] + '..') if len(result) > 75 else result
-        # result = []
-
+        original_sentence = json_data["sentence"].lower().strip()
 
         flask_response = {
-            #'nlp_result': ordered_sentence,
-            'query': query,
-            'result': result
+            'sentence': Sentence(original_sentence, resp).ordered_sentence
         }
         return flask.jsonify(flask_response)
+
 
     else:
         return flask.render_template("index.html")
