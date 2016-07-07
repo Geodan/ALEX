@@ -23,8 +23,13 @@ if __name__ == "__main__":
         payload = {'sentence': " ".join(arguments[1:])}
         headers = {'content-type': 'application/json'}
 
-        response = requests.post(url, data=json.dumps(payload), headers=headers)
-        bot.reply_to(message, response.content.decode("utf-8"))
+        response = json.loads(requests.post(url, data=json.dumps(payload), headers=headers).content.decode("utf-8"))
+        with open('result.txt', 'w') as f:
+            f.write(response["result"])
+        del response["result"]
+        bot.reply_to(message, json.dumps(response))
+        with open('result.txt', 'rb') as f:
+            bot.send_document(message.chat.id, f)
 
 
     bot.polling(none_stop=True)
