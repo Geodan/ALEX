@@ -6,9 +6,6 @@ from Sentence import Sentence
 from wit import Wit
 from pg import DB
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-
-english_stopwords = set(stopwords.words('english'))
 
 db = DB(dbname='gis', host='localhost', port=5432)
 
@@ -56,11 +53,10 @@ def query():
         if not json_data["sentence"]:
             return flask.jsonify({})
         try:
-            resp = client.converse('geobot-session-2', json_data["sentence"], {})
+            resp = client.converse('geobot-session-3', json_data["sentence"], {})
         except:
             return flask.jsonify({'error':'Wit returned an error'})
 
-        print(resp)
 
         if "command" not in resp["entities"]:
             return flask.jsonify({'error': 'No command given'}) #What do I have to do with the the result?
@@ -72,96 +68,19 @@ def query():
             return flask.jsonify({'error': 'No filter given'}) #How do I limit the results?
 
         original_sentence = json_data["sentence"].lower().strip()
-
+        sentence_object = Sentence(original_sentence, resp)
+        sql = sentence_object.sequelize()
         flask_response = {
-            # 'sentence': Sentence(original_sentence, resp).ordered_sentence,
-            'nlp': [str(t) for t in Sentence(original_sentence, resp).nlp_parts]
+            'nlp': [str(t) for t in sentence_object.nlp_parts],
+            'arguments': [str(t) for t in sentence_object.get_argument_stack()],
+            'sql': sql,
+            'result': str(db.query(sql).getresult())
         }
+
         return flask.jsonify(flask_response)
 
     else:
         return flask.render_template("index.html")
-
-
-
-# Very basic mapping atm
-def nlp_result_to_query(sentence, location=None):
-
-    wnl = WordNetLemmatizer()
-
-    started_with_filter = False
-    attributes_to_get = None #attribute: name, toll, etc
-    type_to_get = []
-    database = None
-
-    query = "SELECT * FROM "
-    last_type = None
-    for word, type, word_info in sentence:
-
-        if type == "attribute":
-            word = list(filter(lambda w: not w in english_stopwords, word.split()))[0]
-            print(word)
-            if not attributes_to_get:
-                attributes_to_get = word
-            else:
-                attributes_to_get += word
-        elif type == "search_query":
-            lemma = wnl.lemmatize(word, 'n')
-            if lemma == "road":
-                database = "planet_osm_lines"
-            else:
-                database = "planet_osm_polygon"
-            type_to_get.append(word)
-        elif type == "logic_operator":
-            if last_type == "attribute":
-                query += ","
-            else:
-                if started_with_filter:
-                    query += " "
-                    query += word.upper()
-                    query += " "
-        elif type == "filter":
-            if last_type == "search_query":
-                if not started_with_filter:
-                    query += database
-                    query += " WHERE "
-                else:
-                    query += " AND "
-            distance_within_filter = ["within", "in a radius of"]
-            if word in distance_within_filter:
-                query += "ST_Distance_Sphere(st_transform(way, 4326), ST_MakePoint("
-                query += str(location[0]) + ","
-                query += str(location[1])
-                query += ")) < "
-            started_with_filter = True
-
-        elif type == "distance":
-            query += str(convert_distance_units_to_meters(word_info))
-
-        last_type = type
-
-    # """
-    # WITH buf AS (
-    #     SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(4.9127781,52.3426354), 4326), 3857), 5000) geom
-    # )
-    # SELECT name FROM planet_osm_polygon, buf
-    # WHERE way IS NOT NULL AND
-    #     NOT ST_IsEmpty(way) AND
-    #     ST_Intersects(way, buf.geom)
-    #     AND amenity LIKE '%hospital%';
-    # """
-
-    if started_with_filter:
-        query += " and ("
-    first = True
-    for search in type_to_get:
-        if not first:
-            query += " or "
-        query += " amenity LIKE '%" + wnl.lemmatize(search, 'n') + "%'"
-        first = False
-
-    return query + ") and name is not null limit 10;"
-
 
 
 if __name__ == "__main__":
