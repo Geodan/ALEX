@@ -70,12 +70,14 @@ class WordGroup:
             words = self.trim_next_word_off_sentence(words)
         return result
 
-    def sequelize(self, arguments):
+    def sequelize(self, arguments, context):
         """
         Returns a list of tuples containing SQL queries and an int
         representing the place where the subquery
         must be placed in the the total query. For instance: a 1 (one)
         will be placed as the 2nd subquery (zero indexed).
+        These indexes may collide: these conflicts must be solved
+        by the sequelizer.
         If the int is < 0, it must be placed relative to the wordgroups
         index in the sentence.
 
