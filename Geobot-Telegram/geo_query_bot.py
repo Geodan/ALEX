@@ -24,11 +24,11 @@ if __name__ == "__main__":
         headers = {'content-type': 'application/json'}
 
         response = json.loads(requests.post(url, data=json.dumps(payload), headers=headers).content.decode("utf-8"))
-        with open('result.txt', 'w') as f:
-            f.write(response["result"])
+        with open('result.geojson', 'w') as f:
+            f.write(str(response["result"]))
         del response["result"]
         bot.reply_to(message, json.dumps(response))
-        with open('result.txt', 'rb') as f:
+        with open('result.geojson', 'rb') as f:
             bot.send_document(message.chat.id, f)
 
 
