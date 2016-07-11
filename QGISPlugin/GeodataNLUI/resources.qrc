@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/GeodataNLUI" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
