@@ -90,7 +90,7 @@ class HardCodedFilterClassifier:
 
     def classify(self, words, sentence, current_index):
 
-        radius = ["within", "in a radius of"]
+        radius = ["in", "within", "in a radius of"]
         other = ["where there is", "where"]
 
         if words in radius:
