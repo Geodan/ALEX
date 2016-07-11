@@ -1,7 +1,11 @@
+import geojson
 import flask
 import logging
 import config
 import requests
+import json
+
+
 from Sentence import Sentence
 from wit import Wit
 from pg import DB
@@ -70,11 +74,18 @@ def query():
         original_sentence = json_data["sentence"].lower().strip()
         sentence_object = Sentence(original_sentence, resp)
         sql = sentence_object.sequelize()
+        result = db.query(sql).getresult()
+        geo_objects = []
+        for polygon in result:
+            polygon = polygon[0]
+            geo_objects.append(geojson.Feature(geometry=geojson.loads(polygon)))
+
+
         flask_response = {
             'nlp': [str(t) for t in sentence_object.nlp_parts],
             'arguments': [str(t) for t in sentence_object.get_argument_stack()],
             'sql': sql,
-            'result': str(db.query(sql).getresult())
+            'result': geojson.dumps(geojson.FeatureCollection(geo_objects))
         }
 
         return flask.jsonify(flask_response)
