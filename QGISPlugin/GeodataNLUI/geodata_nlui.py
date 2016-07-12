@@ -210,7 +210,7 @@ class GeodataNLUI:
     #--------------------------------------------------------------------------
 
     def run(self):
-        self.iface.messageBar().pushInfo(u'My Plugin says', u'Yoooo :)')
+        
         """Run method that loads and starts the plugin"""
         if not self.pluginIsActive:
             self.pluginIsActive = True
