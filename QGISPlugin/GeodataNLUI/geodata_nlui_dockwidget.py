@@ -24,29 +24,101 @@
 import os
 import requests
 import json
+import traceback
+import time
+import random
 
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui, QtCore, uic
+from qgis.core import *
 from qgis.utils import iface
-from PyQt4.QtCore import pyqtSignal
 
+#Find class of UI form
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'geodata_nlui_dockwidget_base.ui'))
+
+def randomword(length):
+   return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
+
+class GeoJSONRetriever(QtCore.QObject):
+    '''Worker for retrieving the GeoJSON from the GeodataNLUI and putting
+    it in a QgsVectorLayer'''
+
+    def __init__(self, url, sentence):
+        QtCore.QObject.__init__(self)
+        # if isinstance(layer, QgsVectorLayer) is False:
+        #     raise TypeError('Worker expected a QgsVectorLayer, got a {} instead'.format(type(layer)))
+        self.killed = False
+        self.url = url
+        self.payload = json.dumps({'sentence':  sentence})
+        self.headers = {'content-type': 'application/json'}
+
+    def run(self):
+        ret = None
+        try:
+            response = json.loads(requests.post(self.url, data=self.payload, headers=self.headers).content.decode("utf-8"))
+        except Exception, e:
+            self.error.emit(e, traceback.format_exc())
+            return
+        self.finished.emit(response)
+
+    def kill(self):
+        self.killed = True
+    finished = QtCore.pyqtSignal(object)
+    error = QtCore.pyqtSignal(Exception, basestring)
 
 
 class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
-    closingPlugin = pyqtSignal()
+    closingPlugin = QtCore.pyqtSignal()
+
+    def worker_finished(self, result):
+        # clean up the worker and thread
+        self.worker.deleteLater()
+        self.thread.quit()
+        self.thread.wait()
+        self.thread.deleteLater()
+        self.parserunbutton.setEnabled(True)
+        self.nlquery.setText(str(result))
+
+        #Write to a random named file, so I can open it later as a layer.
+
+        filename = randomword(5) + '.geojson'
+        with open(filename, 'w') as f:
+            f.write(str(result["result"]))
+
+        layer = iface.addVectorLayer(filename, randomword(5), "ogr")
+        if not layer:
+            print "Layer failed to load!"
+        myLayer = iface.activeLayer()
+        myLayer.setCrs(QgsCoordinateReferenceSystem(3857, QgsCoordinateReferenceSystem.EpsgCrsId))
+
+
+
+    def on_error(self, e, exception_string):
+        QgsMessageLog.logMessage('Worker thread raised an exception:\n'.format(exception_string),
+                                    level=QgsMessageLog.CRITICAL)
+        iface.messageBar().pushInfo(u'My Plugin says', exception_string)
+        self.worker.deleteLater()
+        self.thread.quit()
+        self.thread.wait()
+        self.thread.deleteLater()
 
     def parse_and_run(self):
         iface.messageBar().pushInfo(u'NLUI', u'button clicked')
 
-        url = 'http://localhost:8085/parse_and_run_query'
-        payload = json.dumps({'sentence':  self.nlquery.toPlainText()})
-        headers = {'content-type': 'application/json'}
         self.parserunbutton.setEnabled(False)
-        response = requests.post(url, data=payload, headers=headers).content.decode("utf-8")
-        self.nlquery.setText(response)
-        self.parserunbutton.setEnabled(True)
+
+        worker = GeoJSONRetriever('http://localhost:8085/parse_and_run_query', self.nlquery.toPlainText())
+        thread = QtCore.QThread(self)
+        worker.moveToThread(thread)
+
+        worker.finished.connect(self.worker_finished)
+        worker.error.connect(self.on_error)
+        thread.started.connect(worker.run)
+        thread.start()
+
+        self.thread = thread
+        self.worker = worker
 
 
     def __init__(self, parent=None):
