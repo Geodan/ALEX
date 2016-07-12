@@ -170,9 +170,10 @@ class GeodataNLUI:
         icon_path = ':/plugins/GeodataNLUI/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u''),
+            text=self.tr(u'Open docking widget'),
             callback=self.run,
             parent=self.iface.mainWindow())
+
 
     #--------------------------------------------------------------------------
 
@@ -209,8 +210,8 @@ class GeodataNLUI:
     #--------------------------------------------------------------------------
 
     def run(self):
+        self.iface.messageBar().pushInfo(u'My Plugin says', u'Yoooo :)')
         """Run method that loads and starts the plugin"""
-
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
@@ -230,4 +231,3 @@ class GeodataNLUI:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
-
