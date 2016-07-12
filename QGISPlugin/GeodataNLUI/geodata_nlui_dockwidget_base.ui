@@ -16,10 +16,10 @@
   <property name="windowTitle">
    <string>GeodataNLUI</string>
   </property>
-  <widget class="QWidget" name="dockWidgetContents">
+  <widget class="QWidget" name="ui_container">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout">
+    <item row="1" column="0">
+     <layout class="QVBoxLayout" name="vertical">
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
@@ -31,7 +31,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="textEdit">
+       <widget class="QTextEdit" name="nlquery">
         <property name="toolTip">
          <string/>
         </property>
@@ -39,8 +39,8 @@
       </item>
      </layout>
     </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="pushButton">
+    <item row="2" column="0">
+     <widget class="QPushButton" name="parserunbutton">
       <property name="text">
        <string>Parse and Run</string>
       </property>
