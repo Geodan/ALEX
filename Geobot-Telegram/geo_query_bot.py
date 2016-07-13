@@ -20,7 +20,10 @@ if __name__ == "__main__":
             return
 
         url = 'http://localhost:8085/parse_and_run_query'
-        payload = {'sentence': " ".join(arguments[1:])}
+        payload = {
+            'sentence': " ".join(arguments[1:]),
+            'location': [52.3426354, 4.9127781]
+        }
         headers = {'content-type': 'application/json'}
 
         response = json.loads(requests.post(url, data=json.dumps(payload), headers=headers).content.decode("utf-8"))
