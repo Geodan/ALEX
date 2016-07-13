@@ -78,6 +78,14 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.thread.wait()
         self.thread.deleteLater()
         self.parserunbutton.setEnabled(True)
+
+        if not "result" in result:
+            if "error" in result:
+                iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence: ' + result["error"])
+            else:
+                iface.messageBar().pushICritical(u'GeodataNLUI: ', u'Invalid sentence')
+            return
+
         self.nlquery.setText(str(result))
 
         #Write to a random named file, so I can open it later as a layer.
@@ -97,14 +105,13 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
     def on_error(self, e, exception_string):
         QgsMessageLog.logMessage('Worker thread raised an exception:\n'.format(exception_string),
                                     level=QgsMessageLog.CRITICAL)
-        iface.messageBar().pushInfo(u'My Plugin says', exception_string)
+        iface.messageBar().pushCritical(u'Error in GeodataNLUI: ', exception_string)
         self.worker.deleteLater()
         self.thread.quit()
         self.thread.wait()
         self.thread.deleteLater()
 
     def parse_and_run(self):
-        iface.messageBar().pushInfo(u'NLUI', u'button clicked')
 
         self.parserunbutton.setEnabled(False)
 
