@@ -38,6 +38,8 @@ To use our bot, yours has to be trained like ours. Information on this will be a
 Our telegram bot is a fairly straightforward bot. First create a bot using the Botfather. Then get your token and put that in token.txt.
 After that, run the bot: ```python geo_query_bot.py```
 
+If you don't want to host it yourself: click on [this link](https://telegram.me/geo_query_bot), which will add the bot on your telegram client.
+
 
 ### QGIS plugin
 
