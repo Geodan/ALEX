@@ -49,6 +49,12 @@ class RadiusFilter(Filter):
             location = context["location"]
 
         print(location)
+        if len(location) != 3:
+            context["error"] = {
+                "error_code": 2,
+                "error_message": "No EPSG value given"
+            }
+            return ()
 
         result = []
         geom_id = randomword(5)
@@ -62,8 +68,8 @@ class RadiusFilter(Filter):
                     geom_id +
                     " AS (" +
                     "SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(" +
-                    str(location[1]) + "," + str(location[0]) +
-                    "), 4326), 3857)," +
+                    str(location[0]) + "," + str(location[1]) +
+                    "), " + location[2] + "), 3857)," +
                     str(distance.get_meters()) +
                     ") geom)"
                 )
