@@ -51,7 +51,7 @@ def query():
         A JSON array containing the geodata when successful. An empty array
         when not successful.
     """
-    location = (52.3426354, 4.9127781)
+
     if flask.request.method == 'POST':
         json_data = flask.request.get_json(force=True)
         if not json_data["sentence"]:
@@ -61,6 +61,9 @@ def query():
         except:
             return flask.jsonify({'error':'Wit returned an error'})
 
+        location = None
+        if "location" in json_data:
+            location = json_data["location"]
 
         if "command" not in resp["entities"]:
             return flask.jsonify({'error': 'No command given'}) #What do I have to do with the the result?
@@ -73,13 +76,21 @@ def query():
 
         original_sentence = json_data["sentence"].lower().strip()
         sentence_object = Sentence(original_sentence, resp)
-        sql = sentence_object.sequelize()
+
+        if location:
+            sql = sentence_object.sequelize(location=location)
+        else:
+            sql = sentence_object.sequelize()
+
+        if "error_code" in sql:
+            return flask.jsonify(sql)
+
         result = db.query(sql).getresult()
         geo_objects = []
+
         for polygon in result:
             polygon = polygon[0]
             geo_objects.append(geojson.Feature(geometry=geojson.loads(polygon)))
-
 
         flask_response = {
             'nlp': [str(t) for t in sentence_object.nlp_parts],

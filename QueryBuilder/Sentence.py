@@ -115,7 +115,7 @@ class Sentence:
     def add_part(self, part):
         self.nlp_parts.append(part)
 
-    def sequelize(self):
+    def sequelize(self, location=None):
         """
         Returns an SQL query generated from the parts in the SentencePart
 
@@ -137,15 +137,19 @@ class Sentence:
         context = {}
         context["sentence"] = self
         context["counter"] = 0
+        if location:
+            context["location"] = location
 
         try:
             for part in self.nlp_parts:
                 print(part)
 
                 #Arguments are used by other words, not sequelized themselves
-                if not issubclass(type(part),Arguments.Argument):
+                if not issubclass(type(part), Arguments.Argument):
                     print(type(part))
                     new_parts = part.sequelize(self.arguments, context)
+                    if "error" in context:
+                        return context["error"]
                     for new_part in new_parts:
                         if new_part[1] == -1:
                             sql_parts.insert(counter, new_part[0])
