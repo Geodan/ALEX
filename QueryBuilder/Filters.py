@@ -35,10 +35,20 @@ class RadiusFilter(Filter):
 
         distance = arguments.pop(0)
 
+
         if len(arguments) > 1 and type(arguments[0]) == Arguments.Location:
             location = arguments.pop(0)
         else:
-            location = (4.9127781, 52.3426354)
+            if "location" not in context:
+                context["error"] = {
+                    "error_code": 2,
+                    "error_message": "No location given when needed"
+                }
+                return ()
+
+            location = context["location"]
+
+        print(location)
 
         result = []
         geom_id = randomword(5)
@@ -52,7 +62,7 @@ class RadiusFilter(Filter):
                     geom_id +
                     " AS (" +
                     "SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(" +
-                    str(location[0]) + "," + str(location[1]) +
+                    str(location[1]) + "," + str(location[0]) +
                     "), 4326), 3857)," +
                     str(distance.get_meters()) +
                     ") geom)"
