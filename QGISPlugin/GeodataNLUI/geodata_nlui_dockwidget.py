@@ -49,7 +49,7 @@ class GeoJSONRetriever(QtCore.QObject):
         #     raise TypeError('Worker expected a QgsVectorLayer, got a {} instead'.format(type(layer)))
         self.killed = False
         self.url = url
-        self.payload = json.dumps({'sentence':  sentence})
+        self.payload = json.dumps({'sentence':  sentence, 'location': [52.3426354, 4.9127781]})
         self.headers = {'content-type': 'application/json'}
 
     def run(self):
@@ -83,7 +83,7 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
             if "error" in result:
                 iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence: ' + result["error"])
             else:
-                iface.messageBar().pushICritical(u'GeodataNLUI: ', u'Invalid sentence')
+                iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence')
             return
 
         self.nlquery.setText(str(result))
