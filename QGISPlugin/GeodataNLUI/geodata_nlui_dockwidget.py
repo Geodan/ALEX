@@ -6,19 +6,10 @@
  This plugin provides a GUI for our NLUI
                              -------------------
         begin                : 2016-07-11
-        git sha              : $Format:%H$
         copyright            : (C) 2016 by Geodan (Alexander Freeman)
         email                : alexander.freeman@geodan.nl
  ***************************************************************************/
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
 """
 
 import os
@@ -82,10 +73,10 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
         if not "result" in result:
             if "error_message" in result:
 
-                iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence: ['
+                self.iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence: ['
                     + str(result["error_code"]) + "] " + result["error_message"])
             else:
-                iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence')
+                self.iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence')
             return
 
         self.nlquery.setText(str(result))
@@ -96,10 +87,10 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
         with open(filename, 'w') as f:
             f.write(str(result["result"]))
 
-        layer = iface.addVectorLayer(filename, randomword(5), "ogr")
+        layer = self.iface.addVectorLayer(filename, randomword(5), "ogr")
         if not layer:
             print "Layer failed to load!"
-        myLayer = iface.activeLayer()
+        myLayer = self.iface.activeLayer()
         myLayer.setCrs(QgsCoordinateReferenceSystem(3857, QgsCoordinateReferenceSystem.EpsgCrsId))
 
 
@@ -107,7 +98,7 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
     def on_error(self, e, exception_string):
         QgsMessageLog.logMessage('Worker thread raised an exception:\n'.format(exception_string),
                                     level=QgsMessageLog.CRITICAL)
-        iface.messageBar().pushCritical(u'Error in GeodataNLUI: ', exception_string)
+        self.iface.messageBar().pushCritical(u'Error in GeodataNLUI: ', exception_string)
         self.worker.deleteLater()
         self.thread.quit()
         self.thread.wait()
@@ -141,6 +132,15 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         self.parserunbutton.clicked.connect(self.parse_and_run)
+
+        # Save reference to the QGIS interface
+        self.iface = iface
+        # reference to map canvas
+        self.canvas = self.iface.mapCanvas()
+        # our click tool will emit a QgsPoint on every click
+        # self.clickTool = QgsMapToolEmitPoint(self.canvas)
+        # # create our GUI dialog
+        # self.dlg = vector_selectbypointDialog()
 
 
     def closeEvent(self, event):
