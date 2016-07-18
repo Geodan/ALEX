@@ -80,8 +80,10 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.parserunbutton.setEnabled(True)
 
         if not "result" in result:
-            if "error" in result:
-                iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence: ' + result["error"])
+            if "error_message" in result:
+
+                iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence: ['
+                    + str(result["error_code"]) + "] " + result["error_message"])
             else:
                 iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence')
             return
