@@ -69,7 +69,7 @@ class RadiusFilter(Filter):
                     " AS (" +
                     "SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(" +
                     str(location[0]) + "," + str(location[1]) +
-                    "), " + location[2] + "), 3857)," +
+                    "), " + str(location[2]) + "), 3857)," +
                     str(distance.get_meters()) +
                     ") geom)"
                 )
