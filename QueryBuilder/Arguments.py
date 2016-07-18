@@ -62,8 +62,11 @@ class SearchQuery(Argument):
 
     def __init__(self, word):
         super().__init__(word, Type.SearchQuery)
+        words = []
+        for word in word.split(" "):
+            words.append(wnl.lemmatize(word, 'n'))
 
-        self.search = wnl.lemmatize(word, 'n')
+        self.search = " ".join(words)
 
     def get_database(self):
         if self.search == "road":
