@@ -34,13 +34,13 @@ class GeoJSONRetriever(QtCore.QObject):
     '''Worker for retrieving the GeoJSON from the GeodataNLUI and putting
     it in a QgsVectorLayer'''
 
-    def __init__(self, url, sentence):
+    def __init__(self, url, sentence, location):
         QtCore.QObject.__init__(self)
         # if isinstance(layer, QgsVectorLayer) is False:
         #     raise TypeError('Worker expected a QgsVectorLayer, got a {} instead'.format(type(layer)))
         self.killed = False
         self.url = url
-        self.payload = json.dumps({'sentence':  sentence, 'location': [52.3426354, 4.9127781]})
+        self.payload = json.dumps({'sentence':  sentence, 'location': location})
         self.headers = {'content-type': 'application/json'}
 
     def run(self):
@@ -72,7 +72,6 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         if not "result" in result:
             if "error_message" in result:
-
                 self.iface.messageBar().pushCritical(u'GeodataNLUI: ', u'Invalid sentence: ['
                     + str(result["error_code"]) + "] " + result["error_message"])
             else:
@@ -109,7 +108,14 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         self.parserunbutton.setEnabled(False)
 
-        worker = GeoJSONRetriever('http://localhost:8085/parse_and_run_query', self.nlquery.toPlainText())
+        canvas_coords = iface.mapCanvas().extent()
+
+        location_x = ((canvas_coords.xMaximum() - canvas_coords.xMinimum()) /2) + canvas_coords.xMinimum()
+
+        location_y = ((canvas_coords.yMaximum() - canvas_coords.yMinimum()) /2) + canvas_coords.yMinimum()
+
+        worker = GeoJSONRetriever('http://localhost:8085/parse_and_run_query',
+                self.nlquery.toPlainText(), [location_x, location_y, int(self.canvas.mapRenderer().destinationCrs().authid().split(":")[1])])
         thread = QtCore.QThread(self)
         worker.moveToThread(thread)
 
