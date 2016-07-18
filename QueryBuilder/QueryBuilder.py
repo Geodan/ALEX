@@ -55,15 +55,17 @@ def query():
     if flask.request.method == 'POST':
         json_data = flask.request.get_json(force=True)
         if not json_data["sentence"]:
-            return flask.jsonify({})
+            return flask.jsonify({"error_code": 0, "error_message": "No sentence given"})
         try:
             resp = client.converse('geobot-session-3', json_data["sentence"], {})
         except:
-            return flask.jsonify({'error':'Wit returned an error'})
+            return flask.jsonify({'error_code': 1, 'error_message':'Wit returned an error'})
 
         location = None
         if "location" in json_data:
             location = json_data["location"]
+
+        print(location)
 
         if "command" not in resp["entities"]:
             return flask.jsonify({'error': 'No command given'}) #What do I have to do with the the result?
