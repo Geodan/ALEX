@@ -110,6 +110,7 @@ class GeodataNLUIDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.thread.quit()
         self.thread.wait()
         self.thread.deleteLater()
+        self.parserunbutton.setEnabled(True)
 
     def parse_and_run(self):
 
