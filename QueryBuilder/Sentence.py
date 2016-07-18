@@ -160,6 +160,6 @@ class Sentence:
             print(e)
 
         sql_query = " ".join(sql_parts)
-        sql_query += " AND way IS NOT NULL AND NOT ST_IsEmpty(way) AND name is not null;"
+        sql_query += " AND way IS NOT NULL AND NOT ST_IsEmpty(way);"
         sql_query = sql_query.format(databases=",".join(context["databases"]))
         return sql_query
