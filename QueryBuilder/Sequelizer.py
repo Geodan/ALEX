@@ -44,8 +44,6 @@ class Sequelizer(object):
 
         return {'type': 'result', 'result': sentence_object.nlp_parts}
 
-
-
     def identify_datasets(self, language_objects):
         pass
 
@@ -60,12 +58,15 @@ class Sequelizer(object):
         pass
 
     def __init__(self,
+                databases,
                 cf=None,
                 dsf=None,
                 lbf=None,
                 sqlf=None,
                 geojf=None
                 ):
+
+        self.databases = databases
         if not cf:
             self.fn_classify = self.classify
         if not dsf:
@@ -77,7 +78,7 @@ class Sequelizer(object):
         if not geojf:
             self.fn_convert_to_geojson = self.convert_to_geojson
 
-    def handle_request(self, sentence, location):
+    def handle_request(self, sentence, location=None):
         if type(sentence) != str:
             raise ValueError("Sentence is not a string")
 
