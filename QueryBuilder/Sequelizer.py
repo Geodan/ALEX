@@ -24,13 +24,23 @@ actions = {
     'error': error,
 }
 
+db = DB(dbname='gis', host='localhost', port=5432)
+
 client = Wit(config.wit_token, actions)
 
 class Sequelizer(object):
 
 
     def classify(self, sentence):
-        pass
+         try:
+            resp = client.converse('geobot-session-5', sentence, {})
+        except:
+            return flask.jsonify({'error_code': 1, 'error_message':'Wit returned an error'})
+        original_sentence = sentence.lower().strip()
+        sentence_object = Sentence(original_sentence, resp)
+
+        return
+
 
     def identify_datasets(self, language_objects):
         pass
