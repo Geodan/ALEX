@@ -79,7 +79,7 @@ class Sequelizer(object):
 
         if not "type" in language_objects:
             logging.error("No type field in classification result")
-            return {'type':'error', 'error_code': 5, 'Incorrect return type'}
+            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
 
         if language_objects["type"] == "error":
             return language_objects # Error to client
