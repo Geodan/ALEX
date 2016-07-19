@@ -42,7 +42,7 @@ class Sequelizer(object):
         original_sentence = sentence.lower().strip()
         sentence_object = Sentence(original_sentence, resp)
 
-        return {'type': 'result', 'result': Sentence.ordered_sentence}
+        return {'type': 'result', 'result': sentence_object.nlp_parts}
 
 
 
