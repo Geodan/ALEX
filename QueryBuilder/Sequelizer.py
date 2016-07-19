@@ -1,5 +1,30 @@
+import config
+
+from wit import Wit
 
 #TODO document these methods
+
+
+# Needed for the wit.ai client for now :c
+def say(session_id, context, msg):
+    print(msg)
+
+def merge(session_id, context, entities, msg):
+    print("Session id", session_id)
+    print("Context", context)
+    print("entities", entities)
+    print("msg",  msg)
+
+def error(session_id, context, e):
+    print(str(e))
+
+actions = {
+    'say': say,
+    'merge': merge,
+    'error': error,
+}
+
+client = Wit(config.wit_token, actions)
 
 class Sequelizer(object):
 
