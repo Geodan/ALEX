@@ -35,11 +35,11 @@ class Sequelizer(object):
          try:
             resp = client.converse('geobot-session-5', sentence, {})
         except:
-            return flask.jsonify({'error_code': 1, 'error_message':'Wit returned an error'})
+            return {'type': 'error', 'error_code': 1, 'error_message':'Wit returned an error'})
         original_sentence = sentence.lower().strip()
         sentence_object = Sentence(original_sentence, resp)
 
-        return
+        return {'type': 'result', 'result': Sentence.ordered_sentence}
 
 
     def identify_datasets(self, language_objects):
@@ -74,9 +74,10 @@ class Sequelizer(object):
 
         language_objects = self.fn_classify(sentence)
 
-        # TODO check nlp result
+        if not "type" in language_objects:
+            return {'type':'error', 'error_code': 5, 'Incorrect return type'}
 
-        semi_query = self.fn_identify_dataset(language_objects)
+        semi_query = self.fn_identify_dataset(language_objects["result"])
 
         # TODO check dataset result
 
