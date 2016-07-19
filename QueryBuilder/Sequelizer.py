@@ -86,7 +86,7 @@ class Sequelizer(object):
 
         if not "result" in language_objects:
             logging.error("No field result in classification result while it is a result type?")
-            return {'type':'error', 'error_code': 5, 'No result in result'}
+            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
         semi_query = self.fn_identify_dataset(language_objects["result"])
 
