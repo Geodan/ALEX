@@ -113,4 +113,4 @@ class Sequelizer(object):
 
         # TODO Check geojson result
 
-        return geojson
+        return {'type':'result', 'result':geojson}
