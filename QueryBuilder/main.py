@@ -1,8 +1,13 @@
 import flask
 import Sequelizer
+import Datasets
 
 app = flask.Flask(__name__)
-sequelizer = Sequelizer.Sequelizer()
+
+#nit__(self, content, table):
+osm_buildings = Datasets.OSMPolygonTable()
+osm_roads = Datasets.OSMLinesTable()
+sequelizer = Sequelizer.Sequelizer([osm_buildings, osm_roads])
 
 @app.route("/")
 def index():
