@@ -100,7 +100,7 @@ class Sequelizer(object):
 
         # TODO Check SQL results
 
-        geojson = self.fn_convert_to_geojson(sql_results):
+        geojson = self.fn_convert_to_geojson(sql_results)
 
         # TODO Check geojson result
 
