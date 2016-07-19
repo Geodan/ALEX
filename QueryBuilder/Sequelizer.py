@@ -36,7 +36,7 @@ class Sequelizer(object):
         try:
             resp = client.converse('geobot-session-5', sentence, {})
         except:
-            return {'type': 'error', 'error_code': 1, 'error_message':'Wit returned an error'})
+            return {'type': 'error', 'error_code': 1, 'error_message':'Wit returned an error'}
         original_sentence = sentence.lower().strip()
         sentence_object = Sentence(original_sentence, resp)
 
