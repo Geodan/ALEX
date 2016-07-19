@@ -23,18 +23,21 @@ def query():
     """
 
     if flask.request.method == 'POST':
+
         json_data = flask.request.get_json(force=True)
+
         if not "sentence" in json_data:
             return flask.jsonify({"error_code": 0, "error_message": "No sentence given"})
 
         location = None
+
         if "location" in json_data:
             location = json_data["location"]
 
-        geojson = sequelizer.handle_request(json_data["sentence"])
+        geojson = sequelizer.handle_request(json_data["sentence"], location)
 
         flask_response = {
-            'result': 'empty')
+            'result': geojson
         }
 
         return flask.jsonify(flask_response)

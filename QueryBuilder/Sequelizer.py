@@ -68,7 +68,7 @@ class Sequelizer(object):
         self.fn_to_sql_and_run = sqlf
         self.fn_convert_to_geojson = geojf
 
-    def handle_request(self, sentence):
+    def handle_request(self, sentence, location):
         if type(sentence) != str:
             raise ValueError("Sentence is not a string")
 
