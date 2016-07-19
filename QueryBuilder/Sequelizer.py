@@ -33,7 +33,7 @@ class Sequelizer(object):
 
 
     def classify(self, sentence):
-         try:
+        try:
             resp = client.converse('geobot-session-5', sentence, {})
         except:
             return {'type': 'error', 'error_code': 1, 'error_message':'Wit returned an error'})
@@ -41,6 +41,7 @@ class Sequelizer(object):
         sentence_object = Sentence(original_sentence, resp)
 
         return {'type': 'result', 'result': Sentence.ordered_sentence}
+
 
 
     def identify_datasets(self, language_objects):
@@ -74,6 +75,7 @@ class Sequelizer(object):
             raise ValueError("Sentence is not a string")
 
         language_objects = self.fn_classify(sentence)
+        print(language_objects)
 
         if not "type" in language_objects:
             logging.error("No type field in classification result")
