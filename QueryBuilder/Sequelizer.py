@@ -1,6 +1,7 @@
 import config
 import logging
 
+from Sentence import Sentence
 from wit import Wit
 from pg import DB
 
@@ -88,6 +89,7 @@ class Sequelizer(object):
             return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
 
         if language_objects["type"] == "error":
+            logging.error(language_objects["error_message"])
             return language_objects # Error to client
 
         if not "result" in language_objects:
