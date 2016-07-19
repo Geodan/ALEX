@@ -39,11 +39,9 @@ def query():
         if "location" in json_data:
             location = json_data["location"]
 
-        geojson = sequelizer.handle_request(json_data["sentence"], location)
+        result = sequelizer.handle_request(json_data["sentence"], location)
 
-        flask_response = {
-            'result': geojson
-        }
+        flask_response = result
 
         return flask.jsonify(flask_response)
 
