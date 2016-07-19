@@ -115,51 +115,51 @@ class Sentence:
     def add_part(self, part):
         self.nlp_parts.append(part)
 
-    def sequelize(self, location=None):
-        """
-        Returns an SQL query generated from the parts in the SentencePart
-
-        :returns data:
-            A string containing the SQL query.
-        """
-            # WITH buf AS (
-            #     SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(4.9127781,52.3426354), 4326), 3857), 5000) geom
-            # )
-            # SELECT name FROM planet_osm_polygon, buf
-            # WHERE way IS NOT NULL ANDz
-            #     NOT ST_IsEmpty(way) AND
-            #     ST_Intersects(way, buf.geom);
-
-        result = ""
-        counter = 0
-
-        sql_parts = []
-        context = {}
-        context["sentence"] = self
-        context["counter"] = 0
-        if location:
-            context["location"] = location
-
-        try:
-            for part in self.nlp_parts:
-                print(part)
-
-                #Arguments are used by other words, not sequelized themselves
-                if not issubclass(type(part), Arguments.Argument):
-                    print(type(part))
-                    new_parts = part.sequelize(self.arguments, context)
-                    if "error" in context:
-                        return context["error"]
-                    for new_part in new_parts:
-                        if new_part[1] == -1:
-                            sql_parts.insert(counter, new_part[0])
-                        else:
-                            sql_parts.insert(new_part[1], new_part[0])
-                counter += 1
-        except MalformedSentenceException as e:
-            print(e)
-
-        sql_query = " ".join(sql_parts)
-        sql_query += " AND way IS NOT NULL AND NOT ST_IsEmpty(way);"
-        sql_query = sql_query.format(databases=",".join(context["databases"]))
-        return sql_query
+    # def sequelize(self, location=None):
+    #     """
+    #     Returns an SQL query generated from the parts in the SentencePart
+    #
+    #     :returns data:
+    #         A string containing the SQL query.
+    #     """
+    #         # WITH buf AS (
+    #         #     SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(4.9127781,52.3426354), 4326), 3857), 5000) geom
+    #         # )
+    #         # SELECT name FROM planet_osm_polygon, buf
+    #         # WHERE way IS NOT NULL ANDz
+    #         #     NOT ST_IsEmpty(way) AND
+    #         #     ST_Intersects(way, buf.geom);
+    #
+    #     result = ""
+    #     counter = 0
+    #
+    #     sql_parts = []
+    #     context = {}
+    #     context["sentence"] = self
+    #     context["counter"] = 0
+    #     if location:
+    #         context["location"] = location
+    #
+    #     try:
+    #         for part in self.nlp_parts:
+    #             print(part)
+    #
+    #             #Arguments are used by other words, not sequelized themselves
+    #             if not issubclass(type(part), Arguments.Argument):
+    #                 print(type(part))
+    #                 new_parts = part.sequelize(self.arguments, context)
+    #                 if "error" in context:
+    #                     return context["error"]
+    #                 for new_part in new_parts:
+    #                     if new_part[1] == -1:
+    #                         sql_parts.insert(counter, new_part[0])
+    #                     else:
+    #                         sql_parts.insert(new_part[1], new_part[0])
+    #             counter += 1
+    #     except MalformedSentenceException as e:
+    #         print(e)
+    #
+    #     sql_query = " ".join(sql_parts)
+    #     sql_query += " AND way IS NOT NULL AND NOT ST_IsEmpty(way);"
+    #     sql_query = sql_query.format(databases=",".join(context["databases"]))
+    #     return sql_query
