@@ -1,4 +1,5 @@
 import config
+import logging
 
 from wit import Wit
 
@@ -75,7 +76,15 @@ class Sequelizer(object):
         language_objects = self.fn_classify(sentence)
 
         if not "type" in language_objects:
+            logging.error("No type field in classification result")
             return {'type':'error', 'error_code': 5, 'Incorrect return type'}
+
+        if language_objects["type"] == "error":
+            return language_objects # Error to client
+
+        if not "result" in language_objects:
+            logging.error("No field result in classification result while it is a result type?")
+            return {'type':'error', 'error_code': 5, 'No result in result'}
 
         semi_query = self.fn_identify_dataset(language_objects["result"])
 
