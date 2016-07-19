@@ -1,38 +1,8 @@
-import geojson
 import flask
-import logging
-import config
-import requests
-import json
-
-
-from Sentence import Sentence
-from wit import Wit
-from pg import DB
-from nltk.corpus import stopwords
-
-db = DB(dbname='gis', host='localhost', port=5432)
-
-def say(session_id, context, msg):
-    print(msg)
-
-def merge(session_id, context, entities, msg):
-    print("Session id", session_id)
-    print("Context", context)
-    print("entities", entities)
-    print("msg",  msg)
-
-def error(session_id, context, e):
-    print(str(e))
-
-actions = {
-    'say': say,
-    'merge': merge,
-    'error': error,
-}
+import Sequelizer
 
 app = flask.Flask(__name__)
-client = Wit(config.wit_token, actions)
+sequelizer = Sequelizer.Sequelizer()
 
 @app.route("/")
 def index():
@@ -54,51 +24,17 @@ def query():
 
     if flask.request.method == 'POST':
         json_data = flask.request.get_json(force=True)
-        if not json_data["sentence"]:
+        if not "sentence" in json_data:
             return flask.jsonify({"error_code": 0, "error_message": "No sentence given"})
-        try:
-            resp = client.converse('geobot-session-3', json_data["sentence"], {})
-        except:
-            return flask.jsonify({'error_code': 1, 'error_message':'Wit returned an error'})
 
         location = None
         if "location" in json_data:
             location = json_data["location"]
 
-        print(location)
-
-        if "command" not in resp["entities"]:
-            return flask.jsonify({'error': 'No command given'}) #What do I have to do with the the result?
-
-        if "local_search_query" not in resp["entities"]:
-            return flask.jsonify({'error': 'No search query given'}) #What do I have to search?
-
-        if "filter" not in resp["entities"]:
-            return flask.jsonify({'error': 'No filter given'}) #How do I limit the results?
-
-        original_sentence = json_data["sentence"].lower().strip()
-        sentence_object = Sentence(original_sentence, resp)
-
-        if location:
-            sql = sentence_object.sequelize(location=location)
-        else:
-            sql = sentence_object.sequelize()
-
-        if "error_code" in sql:
-            return flask.jsonify(sql)
-
-        result = db.query(sql).getresult()
-        geo_objects = []
-
-        for polygon in result:
-            polygon = polygon[0]
-            geo_objects.append(geojson.Feature(geometry=geojson.loads(polygon)))
+        geojson = sequelizer.handle_request(json_data["sentence"])
 
         flask_response = {
-            'nlp': [str(t) for t in sentence_object.nlp_parts],
-            'arguments': [str(t) for t in sentence_object.get_argument_stack()],
-            'sql': sql,
-            'result': geojson.dumps(geojson.FeatureCollection(geo_objects))
+            'result': 'empty')
         }
 
         return flask.jsonify(flask_response)
