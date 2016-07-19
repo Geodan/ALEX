@@ -2,6 +2,7 @@ import config
 import logging
 
 from wit import Wit
+from pg import DB
 
 #TODO document these methods
 
@@ -58,17 +59,22 @@ class Sequelizer(object):
         pass
 
     def __init__(self,
-                cf=self.classify,
-                dsf=self.identify_datasets,
-                lbf=self.logical_bindings,
-                sqlf=self.to_sql_and_run,
-                geojf=self.convert_to_geojson
+                cf=None,
+                dsf=None,
+                lbf=None,
+                sqlf=None,
+                geojf=None
                 ):
-        self.fn_classify = cf
-        self.fn_identify_dataset = dsf
-        self.fn_logical_bindings = lbf
-        self.fn_to_sql_and_run = sqlf
-        self.fn_convert_to_geojson = geojf
+        if not cf:
+            self.fn_classify = self.classify
+        if not dsf:
+            self.fn_identify_dataset = self.identify_datasets
+        if not lbf:
+            self.fn_logical_bindings = self.logical_bindings
+        if not sqlf:
+            self.fn_to_sql_and_run = self.to_sql_and_run
+        if not geojf:
+            self.fn_convert_to_geojson = self.convert_to_geojson
 
     def handle_request(self, sentence, location):
         if type(sentence) != str:
