@@ -1,4 +1,5 @@
 import Arguments
+import Subsets
 from Exceptions import MalformedSentenceException
 from WordGroup import WordGroup
 import random, string
@@ -12,31 +13,31 @@ class Filter(WordGroup):
     For now an empty class that serves as a type indentifier
     """
 
-    def __init__(self, words):
+    def __init__(self, words, args, optional_args):
         super().__init__(words)
+        self.arguments = args
+        self.optional_arguments = optional_args
 
 class RadiusFilter(Filter):
 
     def __init__(self, words):
-        super().__init__(words)
+        super().__init__(words, [Arguments.Distance], [Arguments.Location])
 
     def __str__(self):
         return "RadiusFilter: " + " ".join(self.words)
 
+    def get_dataset(self, context, sq, args, opt_args):
+        if len(opt_args) == 0:
+            opt_args.append(context["location"])
 
-class ExistenceFilter(Filter):
+        return Subsets.RadiusSubset(sq, args[0], opt_args[0])
 
-    def __init__(self, words):
-        super().__init__(words)
-
-    def __str__(self):
-        return "OtherFilter: " + " ".join(self.words)
 
 # TODO Fix this in the classification stage, this is no filter
 class ReferenceFilter(Filter):
 
     def __init__(self, words):
-        super().__init__(words)
+        super().__init__(words, [], [])
 
     def __str__(self):
         return "ReferenceFilter: " + " ".join(self.words)
@@ -47,16 +48,13 @@ class HardCodedFilterClassifier:
     def __init__(self):
         pass
 
-    def classify(self, words, sentence, current_index):
+    def classify(self, words, sentence, current_index, context=None):
 
         radius = ["in", "within", "in a radius of"]
-        existence = ["where there is", "where"]
         reference = ["of", "from"]
 
 
         if words in radius:
             return RadiusFilter(words)
-        if words in existence:
-            return ExistenceFilter(words)
         if words in reference:
             return ReferenceFilter(words)

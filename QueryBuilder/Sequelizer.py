@@ -1,8 +1,10 @@
 import config
 import logging
+
 import Arguments
 import Commands
 import Filters
+import LogicOperators
 
 from Sentence import Sentence
 from wit import Wit
@@ -46,9 +48,9 @@ class Sequelizer(object):
         sentence_object = Sentence(original_sentence, resp)
 
         # Best place to find the command and store it in the context
-        for lang_object in sentence.nlp_parts:
+        for lang_object in sentence_object.nlp_parts:
             if type(lang_object) == Commands.Command:
-                if context["command"]:
+                if "command" in context:
                     return {'type':'error', 'error_code': 1, 'error_message': 'Two commands are not supported'}
                 context["command"] = lang_object
 
@@ -56,47 +58,95 @@ class Sequelizer(object):
 
     def identify_datasets(self, language_objects, context):
 
-        argument_stack = []
-        context = {}
+        datasets = []
 
-        busy_on_filter = False
+        busy_with_filter = False
+        filter_obj = None
         arg_header = []
         opt_arg_header = []
         arguments = []
         optional_arguments = []
 
-        for lang_object in language_objects:
-            if issubclass(type(lang_object), Arguments.Argument):
-                argument_stack.append(lang_object)
+
+        context["search"] = None
+        context["last_type"] = None
 
         for lang_object in language_objects:
 
             obj_type = type(lang_object)
 
+
+            if obj_type == Arguments.SearchQuery:
+                context["search"] = lang_object
+                continue
+
             if issubclass(obj_type, Arguments.Argument):
+                if not busy_with_filter:
+                    return {'type':'error', 'error_code': 1, 'error_message': 'Argument before filter'}
 
-                if busy_on_filter:
-                    if len(arg_header) > 0:
-                        if obj_type == arg_header[0]:
-                            arguments.append(lang_object)
-                            arg_header.pop(0)
-                        else:
-                            return {'type':'error', 'error_code': 1, 'error_message': 'Missing arguments to filter'}
+                if len(arg_header) > 0:
+                    if arg_header[0] == obj_type:
+                        arg_header.pop(0)
+                        arguments.append(lang_object)
+                        if len(arg_header) == 0:
+
+                            # TODO clean up these 'done' parts
+                            datasets.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+
+                            busy_with_filter = False
+                            filter_obj = None
+                            arg_header = []
+                            opt_arg_header = []
+                            arguments = []
+                            optional_arguments = []
                     else:
-                        if obj_type == opt_arg_header[0]:
-                            optional_arguments.append(lang_object)
-                            opt_arg_header.pop(0)
+                        return {'type':'error', 'error_code': 1, 'error_message': 'Needed arg not found'}
+                elif len(opt_arg_header) > 0:
+                    if opt_arg_header[0] == obj_type:
+                        optional_arguments.append(lang_object)
+                    else:
 
-                argument_stack.pop(0)
+                        # TODO clean up these 'done' parts
 
-            if issubclass(obj_type, Filters.Filter) && obj_type != Filters.ReferenceFilter:
-                busy_on_filter = True
+                        datasets.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+
+                        busy_with_filter = False
+                        filter_obj = None
+                        arg_header = []
+                        opt_arg_header = []
+                        arguments = []
+                        optional_arguments = []
+
+                else:
+
+                    # TODO clean up these 'done' parts
+
+                    datasets.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+
+                    busy_with_filter = False
+                    filter_obj = None
+                    arg_header = []
+                    opt_arg_header = []
+                    arguments = []
+                    optional_arguments = []
+
+            if issubclass(obj_type, Filters.Filter) and obj_type != Filters.ReferenceFilter:
+
+                if busy_with_filter:
+                    if len(arg_header) > 0:
+                        return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
+
+                if not "search" in context:
+                    return {'type':'error', 'error_code': 1, 'error_message': 'Filter without search query'}
+
+                busy_with_filter = True
+                filter_obj = lang_object
                 arg_header = lang_object.arguments
                 opt_arg_header = lang_object.optional_arguments
 
-
-
-        return
+        if busy_with_filter:
+            return {'type':'error', 'error_code': 1, 'error_message': 'Filter not done after sentence'}
+        return datasets
 
     #TODO better name for semi query
     def logical_bindings(self, semi_query, context):
@@ -135,6 +185,9 @@ class Sequelizer(object):
 
         context = {}
 
+        if location:
+            context["location"] = location
+
         language_objects = self.fn_classify(sentence, context)
 
         if not "type" in language_objects:
@@ -150,6 +203,7 @@ class Sequelizer(object):
             return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
         semi_query = self.fn_identify_dataset(language_objects["result"], context)
+        print(semi_query)
 
         # TODO check dataset result
 
