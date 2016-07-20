@@ -5,6 +5,11 @@ class ConnectionTypes(Enum):
     SQL = 1
     HTTP = 2
 
+def StatisticalModel(object):
+
+    def __init__(self, dataset):
+        self.dataset = dataset
+
 class GeoDataset(object):
 
     def __init__(self, db_name, content, table, columns=None):
@@ -17,12 +22,13 @@ class GeoDataset(object):
             self.columns = []
         else:
             self.columns = columns
-
+            
     def map_keyword_to_tags(self, word):
         raise NotImplementedError
 
     def get_location_sql(self):
         raise NotImplementedError
+
 
 
 class OSMTable(GeoDataset):
