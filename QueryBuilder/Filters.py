@@ -98,6 +98,17 @@ class ExistenceFilter(Filter):
     def __str__(self):
         return "OtherFilter: " + " ".join(self.words)
 
+# TODO Fix this in the classification stage, this is no filter
+class ReferenceFilter(Filter):
+
+    def __init__(self, words):
+        super().__init__(words)
+
+    def sequelize(self, arguments, context):
+        return ""
+    def __str__(self):
+        return "ReferenceFilter: " + " ".join(self.words)
+
 
 class HardCodedFilterClassifier:
 
@@ -107,9 +118,13 @@ class HardCodedFilterClassifier:
     def classify(self, words, sentence, current_index):
 
         radius = ["in", "within", "in a radius of"]
-        other = ["where there is", "where"]
+        existence = ["where there is", "where"]
+        reference = ["of", "from"]
+
 
         if words in radius:
             return RadiusFilter(words)
-        else:
+        if words in existence:
             return ExistenceFilter(words)
+        if words in reference:
+            return ReferenceFilter(words)
