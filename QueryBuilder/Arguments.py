@@ -22,9 +22,6 @@ class Argument(WordGroup):
         super().__init__(word)
         self.type = type
 
-    def sequelize(self, arguments, sentence, current_index):
-        return ""
-
 class Location(Argument):
 
     def __init__(self, word):
