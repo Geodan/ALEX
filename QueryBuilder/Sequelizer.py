@@ -1,5 +1,7 @@
 import config
 import logging
+import Arguments
+import Commands
 
 from Sentence import Sentence
 from wit import Wit
@@ -45,7 +47,34 @@ class Sequelizer(object):
         return {'type': 'result', 'result': sentence_object.nlp_parts}
 
     def identify_datasets(self, language_objects):
-        pass
+
+        # I had the idea that maybe it is better to parse it while
+        # reversed, so the arguments go first.
+        # Maybe it will fail tho, idk yet
+
+        language_objects = list(reversed(language_objects))
+        argument_stack = []
+        context = {}
+
+        for lang_object in language_objects:
+            if issubclass(type(lang_object), Arguments.Argument):
+                argument_stack.append(lang_object)
+
+        for lang_object in language_objects:
+
+            obj_type = type(lang_object)
+
+            if obj_type == Commands.Command:
+                if context["command"]:
+                    return {'type':'error', 'error_code': 1, 'error_message': "Two commands?"}
+                context["command"] = lang_object
+
+            if obj_type == Arguments.Location:
+                context["location"] = lang_object
+
+
+
+        return
 
     #TODO better name for semi query
     def logical_bindings(self, semi_query):
@@ -83,7 +112,6 @@ class Sequelizer(object):
             raise ValueError("Sentence is not a string")
 
         language_objects = self.fn_classify(sentence)
-        print(language_objects)
 
         if not "type" in language_objects:
             logging.error("No type field in classification result")
@@ -113,4 +141,4 @@ class Sequelizer(object):
 
         # TODO Check geojson result
 
-        return {'type':'result', 'result':geojson}
+        return {'type':'result', 'result':None}
