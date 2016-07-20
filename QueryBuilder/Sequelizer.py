@@ -2,6 +2,7 @@ import config
 import logging
 import Arguments
 import Commands
+import Filters
 
 from Sentence import Sentence
 from wit import Wit
@@ -36,7 +37,7 @@ client = Wit(config.wit_token, actions)
 class Sequelizer(object):
 
 
-    def classify(self, sentence):
+    def classify(self, sentence, context):
         try:
             resp = client.converse('geobot-session-5', sentence, {})
         except:
@@ -44,17 +45,25 @@ class Sequelizer(object):
         original_sentence = sentence.lower().strip()
         sentence_object = Sentence(original_sentence, resp)
 
+        # Best place to find the command and store it in the context
+        for lang_object in sentence.nlp_parts:
+            if type(lang_object) == Commands.Command:
+                if context["command"]:
+                    return {'type':'error', 'error_code': 1, 'error_message': 'Two commands are not supported'}
+                context["command"] = lang_object
+
         return {'type': 'result', 'result': sentence_object.nlp_parts}
 
-    def identify_datasets(self, language_objects):
+    def identify_datasets(self, language_objects, context):
 
-        # I had the idea that maybe it is better to parse it while
-        # reversed, so the arguments go first.
-        # Maybe it will fail tho, idk yet
-
-        language_objects = list(reversed(language_objects))
         argument_stack = []
         context = {}
+
+        busy_on_filter = False
+        arg_header = []
+        opt_arg_header = []
+        arguments = []
+        optional_arguments = []
 
         for lang_object in language_objects:
             if issubclass(type(lang_object), Arguments.Argument):
@@ -64,26 +73,39 @@ class Sequelizer(object):
 
             obj_type = type(lang_object)
 
-            if obj_type == Commands.Command:
-                if context["command"]:
-                    return {'type':'error', 'error_code': 1, 'error_message': "Two commands?"}
-                context["command"] = lang_object
+            if issubclass(obj_type, Arguments.Argument):
 
-            if obj_type == Arguments.Location:
-                context["location"] = lang_object
+                if busy_on_filter:
+                    if len(arg_header) > 0:
+                        if obj_type == arg_header[0]:
+                            arguments.append(lang_object)
+                            arg_header.pop(0)
+                        else:
+                            return {'type':'error', 'error_code': 1, 'error_message': 'Missing arguments to filter'}
+                    else:
+                        if obj_type == opt_arg_header[0]:
+                            optional_arguments.append(lang_object)
+                            opt_arg_header.pop(0)
+
+                argument_stack.pop(0)
+
+            if issubclass(obj_type, Filters.Filter) && obj_type != Filters.ReferenceFilter:
+                busy_on_filter = True
+                arg_header = lang_object.arguments
+                opt_arg_header = lang_object.optional_arguments
 
 
 
         return
 
     #TODO better name for semi query
-    def logical_bindings(self, semi_query):
+    def logical_bindings(self, semi_query, context):
         pass
 
-    def to_sql_and_run(self, logical_sentence):
+    def to_sql_and_run(self, logical_sentence, context):
         pass
 
-    def convert_to_geojson(self, results):
+    def convert_to_geojson(self, results, context):
         pass
 
     def __init__(self,
@@ -111,7 +133,9 @@ class Sequelizer(object):
         if type(sentence) != str:
             raise ValueError("Sentence is not a string")
 
-        language_objects = self.fn_classify(sentence)
+        context = {}
+
+        language_objects = self.fn_classify(sentence, context)
 
         if not "type" in language_objects:
             logging.error("No type field in classification result")
@@ -125,19 +149,19 @@ class Sequelizer(object):
             logging.error("No field result in classification result while it is a result type?")
             return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
-        semi_query = self.fn_identify_dataset(language_objects["result"])
+        semi_query = self.fn_identify_dataset(language_objects["result"], context)
 
         # TODO check dataset result
 
-        logical_sentence = self.fn_logical_bindings(semi_query)
+        logical_sentence = self.fn_logical_bindings(semi_query, context)
 
         # TODO check logical bindings
 
-        sql_results = self.fn_to_sql_and_run(logical_sentence)
+        sql_results = self.fn_to_sql_and_run(logical_sentence, context)
 
         # TODO Check SQL results
 
-        geojson = self.fn_convert_to_geojson(sql_results)
+        geojson = self.fn_convert_to_geojson(sql_results, context)
 
         # TODO Check geojson result
 
