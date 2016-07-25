@@ -2,3 +2,4 @@ venv/
 QueryBuilder/config.py
 Geobot-Telegram/token.txt
 __pycache__/
+QueryBuilder/__pycache__/
