@@ -22,7 +22,7 @@ class GeoDataset(object):
             self.columns = []
         else:
             self.columns = columns
-            
+
     def map_keyword_to_tags(self, word):
         raise NotImplementedError
 
@@ -76,9 +76,9 @@ class OSMLinesTable(OSMTable):
         )
 
     def map_keyword_to_tags(self, word):
-        if word == "train_rail" or word == "train_line" or word == "trainrail" or word == "trainline":
+        if word in ["train_rail", "train_line", "trainrail", "trainline"]:
             return [("railway", "rail")]
-        if word == "railroads" or word == "rail" or word == "railway":
+        if word in ["railroads", "rail", "railway"]:
             return [("railway", "rail"), ("railway", "subway")]
-        if word == "subway" or word == "subway_rail" or word == "subway_line":
+        if word in ["subway", "subway_rail","subway_line"]:
             return [("railway", "subway")]
