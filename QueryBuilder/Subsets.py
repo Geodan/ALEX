@@ -18,7 +18,7 @@ class RadiusSubset(object):
         return self.search_query and self.distance and self.location and self.dataset
 
     def __str__(self):
-        return "%s within %s from %s" % (self.search_query, self.distance, self.location)
+        return "RadiusSubset: %s within %s from %s" % (self.search_query, self.distance, self.location)
 
 
 class GeomSubset(object):
