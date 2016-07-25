@@ -3,6 +3,7 @@ import Arguments
 import Commands
 import Filters
 import LogicOperators
+import Classifiers
 
 from WordGroup import WordGroup
 from Exceptions import MalformedSentenceException
@@ -86,7 +87,7 @@ class Sentence:
         counter = 0
         for word in ordered_sentence:
             if word["type"] == "filter":
-                nlp_parts.append(Filters.HardCodedFilterClassifier().classify(word["value"], self, counter))
+                nlp_parts.append(Classifiers.HardCodedFilterClassifier().classify(word["value"], self, counter))
             elif word["type"] == "local_search_query":
                 nlp_parts.append(Arguments.SearchQuery(word["value"]))
             elif word["type"] == "distance":
@@ -102,7 +103,6 @@ class Sentence:
         self.nlp_parts = nlp_parts
         print(ordered_sentence)
         print(nlp_parts)
-
 
 
     def get_argument_stack(self):

@@ -41,20 +41,3 @@ class ReferenceFilter(Filter):
 
     def __str__(self):
         return "ReferenceFilter: " + " ".join(self.words)
-
-
-class HardCodedFilterClassifier:
-
-    def __init__(self):
-        pass
-
-    def classify(self, words, sentence, current_index, context=None):
-
-        radius = ["in", "within", "in a radius of"]
-        reference = ["of", "from"]
-
-
-        if words in radius:
-            return RadiusFilter(words)
-        if words in reference:
-            return ReferenceFilter(words)
