@@ -101,9 +101,6 @@ class Sentence:
             counter += 1
 
         self.nlp_parts = nlp_parts
-        print(ordered_sentence)
-        print(nlp_parts)
-
 
     def get_argument_stack(self):
         result = []
