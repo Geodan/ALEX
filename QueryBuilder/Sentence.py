@@ -2,7 +2,7 @@ import copy
 import Arguments
 import Commands
 import Filters
-import LogicOperators
+import Logic
 import Classifiers
 
 from WordGroup import WordGroup
@@ -97,7 +97,7 @@ class Sentence:
             elif word["type"] == "reference":
                 nlp_parts.append(Arguments.Location(word["value"]))
             elif word["type"] == "logic_operator":
-                nlp_parts.append(LogicOperators.LogicOperator(word["value"]))
+                nlp_parts.append(Logic.LogicOperator(word["value"]))
             counter += 1
 
         self.nlp_parts = nlp_parts

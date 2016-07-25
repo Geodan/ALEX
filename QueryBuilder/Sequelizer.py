@@ -4,7 +4,7 @@ import logging
 import Arguments
 import Commands
 import Filters
-import LogicOperators
+import Logic
 
 from Sentence import Sentence
 from wit import Wit
@@ -185,7 +185,7 @@ class Sequelizer(object):
             else:
                 # The next step needs this information, so lets give it
                 new_sentence.append(lang_object)
-                
+
         if filter_obj:
             return {'type':'error', 'error_code': 1, 'error_message': 'Filter not done after sentence'}
         return new_sentence
