@@ -53,14 +53,13 @@ class Sequelizer(object):
                 if "command" in context:
                     return {'type':'error', 'error_code': 1, 'error_message': 'Two commands are not supported'}
                 context["command"] = lang_object
-
+        context["sentence"] = sentence_object
         return {'type': 'result', 'result': sentence_object.nlp_parts}
 
     def identify_datasets(self, language_objects, context):
 
-        datasets = []
+        new_sentence = []
 
-        busy_with_filter = False
         filter_obj = None
         arg_header = []
         opt_arg_header = []
@@ -71,46 +70,82 @@ class Sequelizer(object):
         context["search"] = None
         context["last_type"] = None
 
+        index = 0
+
         for lang_object in language_objects:
 
             obj_type = type(lang_object)
 
-
+            # We found something to search for :D!
             if obj_type == Arguments.SearchQuery:
+
+                # Lets store it for now
+                context["search_index"] = index
                 context["search"] = lang_object
                 continue
 
-            if issubclass(obj_type, Arguments.Argument):
-                if not busy_with_filter:
+            elif issubclass(obj_type, Arguments.Argument):
+                if not filter_obj:
                     return {'type':'error', 'error_code': 1, 'error_message': 'Argument before filter'}
 
+                # If there are still arguments left
                 if len(arg_header) > 0:
+
+                    # And it is the right type
                     if arg_header[0] == obj_type:
+
+                        #Take it!
                         arg_header.pop(0)
                         arguments.append(lang_object)
-                        if len(arg_header) == 0:
+
+                        #If its the last word and there are no arguments left
+                        if index == (len(language_objects) - 1) and len(arg_header) == 0:
+
+                            # Its done :)
 
                             # TODO clean up these 'done' parts
-                            datasets.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+                            new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
 
-                            busy_with_filter = False
+                            filter_obj = None
+                            arg_header = []
+                            opt_arg_header = []
+                            arguments = []
+                            optional_arguments = []
+
+                    else:
+                        # Otherwise its a malformed sentence
+                        return {'type':'error', 'error_code': 1, 'error_message': 'Needed arg not found'}
+
+                # Maybe there is an optional argument left?
+                elif len(opt_arg_header) > 0:
+
+                    # If it is what we are searching for
+                    if opt_arg_header[0] == obj_type:
+
+                        #Store it
+                        optional_arguments.pop(0)
+                        optional_arguments.append(lang_object)
+
+                        #If its the last word and there are no optional arguments left
+                        if index == (len(language_objects) - 1) and len(opt_arg_header) == 0:
+
+                            # Its done :)
+
+                            # TODO clean up these 'done' parts
+                            new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+
                             filter_obj = None
                             arg_header = []
                             opt_arg_header = []
                             arguments = []
                             optional_arguments = []
                     else:
-                        return {'type':'error', 'error_code': 1, 'error_message': 'Needed arg not found'}
-                elif len(opt_arg_header) > 0:
-                    if opt_arg_header[0] == obj_type:
-                        optional_arguments.append(lang_object)
-                    else:
-
+                        # we are done!
                         # TODO clean up these 'done' parts
 
-                        datasets.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
 
-                        busy_with_filter = False
+                        new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+
                         filter_obj = None
                         arg_header = []
                         opt_arg_header = []
@@ -121,32 +156,39 @@ class Sequelizer(object):
 
                     # TODO clean up these 'done' parts
 
-                    datasets.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+                    new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
 
-                    busy_with_filter = False
                     filter_obj = None
                     arg_header = []
                     opt_arg_header = []
                     arguments = []
                     optional_arguments = []
 
-            if issubclass(obj_type, Filters.Filter) and obj_type != Filters.ReferenceFilter:
+            # Its a filter!
+            elif issubclass(obj_type, Filters.Filter) and obj_type != Filters.ReferenceFilter:
 
-                if busy_with_filter:
-                    if len(arg_header) > 0:
-                        return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
+                # Maybe we are still undergoing some argument hunting?
+                if filter_obj:
+                    # if so, malformed sentence
+                    return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
 
+                # And if we don't know what to search for, its a malformed sentence too
                 if not "search" in context:
                     return {'type':'error', 'error_code': 1, 'error_message': 'Filter without search query'}
 
-                busy_with_filter = True
+
+                # Lets hunt for these arguments!
                 filter_obj = lang_object
                 arg_header = lang_object.arguments
                 opt_arg_header = lang_object.optional_arguments
 
-        if busy_with_filter:
+            else:
+                # The next step needs this information, so lets give it
+                new_sentence.append(lang_object)
+                
+        if filter_obj:
             return {'type':'error', 'error_code': 1, 'error_message': 'Filter not done after sentence'}
-        return datasets
+        return new_sentence
 
     #TODO better name for semi query
     def logical_bindings(self, semi_query, context):
