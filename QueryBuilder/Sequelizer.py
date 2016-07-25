@@ -65,6 +65,7 @@ class Sequelizer(object):
         opt_arg_header = []
         arguments = []
         optional_arguments = []
+        cleanup = False
 
 
         context["search"] = None
@@ -72,9 +73,22 @@ class Sequelizer(object):
 
         index = 0
 
+        # Check all language_objects
         for lang_object in language_objects:
 
             obj_type = type(lang_object)
+            print("TYPE", obj_type)
+
+            if cleanup:
+                new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+
+                filter_obj = None
+                arg_header = []
+                opt_arg_header = []
+                arguments = []
+                optional_arguments = []
+                cleanup = False
+
 
             # We found something to search for :D!
             if obj_type == Arguments.SearchQuery:
@@ -82,7 +96,6 @@ class Sequelizer(object):
                 # Lets store it for now
                 context["search_index"] = index
                 context["search"] = lang_object
-                continue
 
             elif issubclass(obj_type, Arguments.Argument):
                 if not filter_obj:
@@ -100,17 +113,8 @@ class Sequelizer(object):
 
                         #If its the last word and there are no arguments left
                         if index == (len(language_objects) - 1) and len(arg_header) == 0:
-
                             # Its done :)
-
-                            # TODO clean up these 'done' parts
-                            new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
-
-                            filter_obj = None
-                            arg_header = []
-                            opt_arg_header = []
-                            arguments = []
-                            optional_arguments = []
+                            cleanup = True
 
                     else:
                         # Otherwise its a malformed sentence
@@ -128,41 +132,15 @@ class Sequelizer(object):
 
                         #If its the last word and there are no optional arguments left
                         if index == (len(language_objects) - 1) and len(opt_arg_header) == 0:
-
                             # Its done :)
-
-                            # TODO clean up these 'done' parts
-                            new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
-
-                            filter_obj = None
-                            arg_header = []
-                            opt_arg_header = []
-                            arguments = []
-                            optional_arguments = []
+                            cleanup = True
                     else:
-                        # we are done!
-                        # TODO clean up these 'done' parts
-
-
-                        new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
-
-                        filter_obj = None
-                        arg_header = []
-                        opt_arg_header = []
-                        arguments = []
-                        optional_arguments = []
+                        # Its done :)
+                        cleanup = True
 
                 else:
+                    cleanup = True
 
-                    # TODO clean up these 'done' parts
-
-                    new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
-
-                    filter_obj = None
-                    arg_header = []
-                    opt_arg_header = []
-                    arguments = []
-                    optional_arguments = []
 
             # Its a filter!
             elif issubclass(obj_type, Filters.Filter) and obj_type != Filters.ReferenceFilter:
@@ -185,6 +163,18 @@ class Sequelizer(object):
             else:
                 # The next step needs this information, so lets give it
                 new_sentence.append(lang_object)
+
+            index += 1
+
+        # One last cleanup ey? :)
+        if cleanup:
+            new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+
+            filter_obj = None
+            arg_header = []
+            opt_arg_header = []
+            arguments = []
+            optional_arguments = []
 
         if filter_obj:
             return {'type':'error', 'error_code': 1, 'error_message': 'Filter not done after sentence'}
