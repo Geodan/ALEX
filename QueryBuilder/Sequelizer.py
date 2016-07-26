@@ -48,11 +48,13 @@ class Sequelizer(object):
         sentence_object = Sentence(original_sentence, resp)
 
         # Best place to find the command and store it in the context
-        for lang_object in sentence_object.nlp_parts:
+        for index, lang_object in enumerate(sentence_object.nlp_parts):
             if type(lang_object) == Commands.Command:
                 if "command" in context:
                     return {'type':'error', 'error_code': 1, 'error_message': 'Two commands are not supported'}
                 context["command"] = lang_object
+                del sentence_object.nlp_parts[index]
+
         context["sentence"] = sentence_object
         return {'type': 'result', 'result': sentence_object.nlp_parts}
 
@@ -60,16 +62,27 @@ class Sequelizer(object):
 
         new_sentence = []
 
+        # Current filter object
         filter_obj = None
-        arg_header = []
-        opt_arg_header = []
-        arguments = []
-        optional_arguments = []
-        cleanup = False
 
+        # The argument types the filter takes
+        arg_header = []
+
+        # The argument types the filter can optionally take extra
+        opt_arg_header = []
+
+        # Current argument stack
+        arguments = []
+
+        # Current optional argument stack
+        optional_arguments = []
+
+        # Do we have to clean up?
+        cleanup = False
 
         context["search"] = None
         context["last_type"] = None
+        context["datasets"] = []
 
         index = 0
 
@@ -77,11 +90,12 @@ class Sequelizer(object):
         for lang_object in language_objects:
 
             obj_type = type(lang_object)
-            print("TYPE", obj_type)
 
             if cleanup:
-                new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
-
+                new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+                new_sentence.append(new_dataset)
+                context["datasets"].append(new_dataset)
+                data
                 filter_obj = None
                 arg_header = []
                 opt_arg_header = []
@@ -147,8 +161,23 @@ class Sequelizer(object):
 
                 # Maybe we are still undergoing some argument hunting?
                 if filter_obj:
-                    # if so, malformed sentence
-                    return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
+
+                    # If old filter can't be done
+                    if len(arg_header) != 0:
+
+                        # if so, malformed sentence
+                        return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
+                    else:
+                        new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+                        new_sentence.append(new_dataset)
+                        context["datasets"].append(new_dataset)
+
+                        filter_obj = None
+                        arg_header = []
+                        opt_arg_header = []
+                        arguments = []
+                        optional_arguments = []
+
 
                 # And if we don't know what to search for, its a malformed sentence too
                 if not "search" in context:
@@ -160,7 +189,24 @@ class Sequelizer(object):
                 arg_header = lang_object.arguments
                 opt_arg_header = lang_object.optional_arguments
 
+
             else:
+                # If old filter can't be done
+                if len(arg_header) != 0:
+
+                    # if so, malformed sentence
+                    return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
+                else:
+                    if filter_obj:
+                        new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+                        new_sentence.append(new_dataset)
+                        context["datasets"].append(new_dataset)
+
+                        filter_obj = None
+                        arg_header = []
+                        opt_arg_header = []
+                        arguments = []
+                        optional_arguments = []
                 # The next step needs this information, so lets give it
                 new_sentence.append(lang_object)
 
@@ -168,7 +214,9 @@ class Sequelizer(object):
 
         # One last cleanup ey? :)
         if cleanup:
-            new_sentence.append(filter_obj.get_dataset(context, context["search"], arguments, optional_arguments))
+            new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+            new_sentence.append(new_dataset)
+            context["datasets"].append(new_dataset)
 
             filter_obj = None
             arg_header = []
@@ -177,15 +225,37 @@ class Sequelizer(object):
             optional_arguments = []
 
         if filter_obj:
+            print(filter_obj)
             return {'type':'error', 'error_code': 1, 'error_message': 'Filter not done after sentence'}
         return new_sentence
 
     #TODO better name for semi query
     def logical_bindings(self, semi_query, context):
-        pass
 
-    def to_sql_and_run(self, logical_sentence, context):
-        pass
+        bindings = []
+        for index, query_object in enumerate(semi_query):
+            obj_type = type(query_object)
+            if issubclass(obj_type, Logic.Binding):
+                if index != 0 and index != (len(semi_query) - 1):
+                    query_object.one = index - 1
+                    if issubclass(type(semi_query[index + 1]), Logic.Inverter):
+                        query_object.inverted = True
+                        if index != (len(semi_query - 2)):
+                            query_object.two = index + 2
+                        else:
+                            #TODO ERROR
+                            pass
+                    else:
+                        query_object.two = index + 1
+                    bindings.append(query_object)
+            else:
+                #TODO ERROR
+                pass
+
+        return((context["datasets"], bindings))
+
+    def to_sql_and_run(self, databindings, context):
+
 
     def convert_to_geojson(self, results, context):
         pass
@@ -222,6 +292,8 @@ class Sequelizer(object):
 
         language_objects = self.fn_classify(sentence, context)
 
+        print(sentence)
+
         if not "type" in language_objects:
             logging.error("No type field in classification result")
             return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
@@ -234,12 +306,15 @@ class Sequelizer(object):
             logging.error("No field result in classification result while it is a result type?")
             return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
+        print(language_objects["result"])
+
         semi_query = self.fn_identify_dataset(language_objects["result"], context)
         print(semi_query)
 
         # TODO check dataset result
 
         logical_sentence = self.fn_logical_bindings(semi_query, context)
+        print(logical_sentence)
 
         # TODO check logical bindings
 
