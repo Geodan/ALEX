@@ -230,7 +230,7 @@ class Sequelizer(object):
         return {'type': 'result', 'result': (new_sentence, context["datasets"])}
 
     #TODO better name for semi query
-    def logical_bindings(self, semi_query, context):
+    def logical_bindings(self, semi_query, datasets, context):
 
         bindings = []
         for index, query_object in enumerate(semi_query):
@@ -252,7 +252,7 @@ class Sequelizer(object):
                 #TODO ERROR
                 pass
 
-        return((context["datasets"], bindings))
+        return((datasets, bindings))
 
     def to_sql_and_run(self, databindings, context):
         pass
@@ -323,7 +323,7 @@ class Sequelizer(object):
             return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
 
-        logical_sentence = self.fn_logical_bindings(semi_query["result"][0], semi_query["result"][0], context)
+        logical_sentence = self.fn_logical_bindings(semi_query["result"][0], semi_query["result"][1], context)
         print(logical_sentence)
 
         # TODO check logical bindings
