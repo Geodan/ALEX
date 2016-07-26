@@ -227,7 +227,7 @@ class Sequelizer(object):
         if filter_obj:
             print(filter_obj)
             return {'type':'error', 'error_code': 1, 'error_message': 'Filter not done after sentence'}
-        return new_sentence
+        return {'type': 'result', 'result': (new_sentence, context["datasets"])}
 
     #TODO better name for semi query
     def logical_bindings(self, semi_query, context):
@@ -255,7 +255,7 @@ class Sequelizer(object):
         return((context["datasets"], bindings))
 
     def to_sql_and_run(self, databindings, context):
-
+        pass
 
     def convert_to_geojson(self, results, context):
         pass
@@ -309,11 +309,21 @@ class Sequelizer(object):
         print(language_objects["result"])
 
         semi_query = self.fn_identify_dataset(language_objects["result"], context)
-        print(semi_query)
 
-        # TODO check dataset result
+        if not "type" in semi_query:
+            logging.error("No type field in dataset result")
+            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
 
-        logical_sentence = self.fn_logical_bindings(semi_query, context)
+        if semi_query["type"] == "error":
+            logging.error(semi_query["error_message"])
+            return semi_query # Error to client
+
+        if not "result" in semi_query:
+            logging.error("No field result in dataset result while it is a result type?")
+            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
+
+
+        logical_sentence = self.fn_logical_bindings(semi_query["result"][0], semi_query["result"][0], context)
         print(logical_sentence)
 
         # TODO check logical bindings
