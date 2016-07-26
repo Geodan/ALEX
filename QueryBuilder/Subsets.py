@@ -1,6 +1,8 @@
 
+class Subset:
+    pass
 
-class RadiusSubset(object):
+class RadiusSubset(Subset):
 
     def __init__(self,
                 search_query=None,
@@ -21,7 +23,7 @@ class RadiusSubset(object):
         return "RadiusSubset: %s within %s from %s" % (self.search_query, self.distance, self.location)
 
 
-class GeomSubset(object):
+class GeomSubset(Subset):
 
     def __init__(self,
                 search_query=None,
