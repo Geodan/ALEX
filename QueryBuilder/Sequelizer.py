@@ -8,7 +8,6 @@ import Logic
 
 from Sentence import Sentence
 from wit import Wit
-from pg import DB
 
 #TODO document these methods
 
@@ -31,8 +30,6 @@ actions = {
     'merge': merge,
     'error': error,
 }
-
-db = DB(dbname='gis', host='localhost', port=5432)
 
 client = Wit(config.wit_token, actions)
 
@@ -235,18 +232,36 @@ class Sequelizer(object):
         bindings = []
         for index, query_object in enumerate(semi_query):
             obj_type = type(query_object)
+
+            # If it is a binding
             if issubclass(obj_type, Logic.Binding):
+
+                # If its the first or the last, it cant bind
                 if index != 0 and index != (len(semi_query) - 1):
+
+                    # The one before is our first set
                     query_object.one = index - 1
+
+                    # Check if it is negated after where there are not etc.
                     if issubclass(type(semi_query[index + 1]), Logic.Inverter):
+
+                        #Its inverted :D
                         query_object.inverted = True
+
+                        # Check two spaces after, if we can
                         if index != (len(semi_query - 2)):
+
+                            # Set the relativity of the second set
                             query_object.two = index + 2
+                            semi_query[index + 2].relative = True
+                            semi_query[index + 2].relative_to = semi_query[index - 1]
                         else:
                             #TODO ERROR
                             pass
                     else:
                         query_object.two = index + 1
+                        semi_query[index + 1].relative = True
+                        semi_query[index + 1].relative_to = semi_query[index - 1]
                     bindings.append(query_object)
             else:
                 #TODO ERROR
