@@ -1,13 +1,15 @@
 import flask
 import Sequelizer
 import Datasets
+from pg import DB
 
 app = flask.Flask(__name__)
 
+db = DB(dbname='gis', host='localhost', port=5432)
 #nit__(self, content, table):
-osm_buildings = Datasets.OSMPolygonTable()
-osm_roads = Datasets.OSMLinesTable()
-sequelizer = Sequelizer.Sequelizer([osm_buildings, osm_roads])
+osm_buildings = Datasets.OSMPolygonTable(db)
+#osm_roads = Datasets.OSMLinesTable()
+sequelizer = Sequelizer.Sequelizer([osm_buildings])
 
 @app.route("/")
 def index():
