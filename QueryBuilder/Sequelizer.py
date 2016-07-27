@@ -270,10 +270,25 @@ class Sequelizer(object):
         return {'type': 'result', 'result': (datasets, bindings)}
 
     def to_sql(self, databindings, context):
+
+        # Only test SQLization. The real parts are going to be put
+        # in the SQLQuery.py file
+
         sql = ""
         for subset in databindings[0]:
             if not subset.relative:
                 sql += self.databases[0].get_subset(subset)
+
+        sql += "SELECT "
+        for subset in databindings[0]:
+            sql += "%s.way" % (subset.id)
+
+        sql += " FROM "
+
+        for subset in databindings[0]:
+            sql += "%s" % (subset.id)
+
+        sql += ";"
 
         print(sql)
 
