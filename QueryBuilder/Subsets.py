@@ -1,6 +1,14 @@
+import random, string
+
+def randomword(length):
+   return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 
 class Subset:
-    pass
+
+    def __init__(self):
+        self.id = randomword(5)
+        self.relative = False
+        self.relative_to = None
 
 class RadiusSubset(Subset):
 
@@ -10,6 +18,7 @@ class RadiusSubset(Subset):
                 location=None,
                 dataset=None
                 ):
+        super().__init__()
         self.search_query = search_query
         self.distance = distance
         self.location = location
