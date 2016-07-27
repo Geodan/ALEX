@@ -267,12 +267,17 @@ class Sequelizer(object):
                 #TODO ERROR
                 pass
 
-        return((datasets, bindings))
+        return {'type': 'result', 'result': (datasets, bindings)}
 
-    def to_sql_and_run(self, databindings, context):
-        pass
+    def to_sql(self, databindings, context):
+        sql = ""
+        for subset in databindings[0]:
+            if not subset.relative:
+                sql += self.databases[0].get_subset(subset)
 
-    def convert_to_geojson(self, results, context):
+        print(sql)
+
+    def get_geojson(self, results, context):
         pass
 
     def __init__(self,
@@ -292,9 +297,9 @@ class Sequelizer(object):
         if not lbf:
             self.fn_logical_bindings = self.logical_bindings
         if not sqlf:
-            self.fn_to_sql_and_run = self.to_sql_and_run
+            self.fn_to_sql = self.to_sql
         if not geojf:
-            self.fn_convert_to_geojson = self.convert_to_geojson
+            self.fn_get_geojson = self.get_geojson
 
     def handle_request(self, sentence, location=None):
         if type(sentence) != str:
@@ -321,10 +326,10 @@ class Sequelizer(object):
             logging.error("No field result in classification result while it is a result type?")
             return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
-        print(language_objects["result"])
+        print(language_objects)
 
         semi_query = self.fn_identify_dataset(language_objects["result"], context)
-
+        print(semi_query)
         if not "type" in semi_query:
             logging.error("No type field in dataset result")
             return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
@@ -337,17 +342,25 @@ class Sequelizer(object):
             logging.error("No field result in dataset result while it is a result type?")
             return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
-
         logical_sentence = self.fn_logical_bindings(semi_query["result"][0], semi_query["result"][1], context)
         print(logical_sentence)
+        if not "type" in logical_sentence:
+            logging.error("No type field in dataset result")
+            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
 
-        # TODO check logical bindings
+        if logical_sentence["type"] == "error":
+            logging.error(logical_sentence["error_message"])
+            return logical_sentence # Error to client
 
-        sql_results = self.fn_to_sql_and_run(logical_sentence, context)
+        if not "result" in logical_sentence:
+            logging.error("No field result in dataset result while it is a result type?")
+            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
+
+        sql = self.fn_to_sql(logical_sentence["result"], context)
 
         # TODO Check SQL results
 
-        geojson = self.fn_convert_to_geojson(sql_results, context)
+        geojson = self.fn_get_geojson(sql, context)
 
         # TODO Check geojson result
 
