@@ -52,26 +52,31 @@ class OSMTable(GeoDataset):
         sql = ""
         if subset.relative:
             return ""
+
+        # Only the first static dataset gets 'WITH'
+        first = True
         if subset_type == Subsets.RadiusSubset:
             sql += """
-            WITH %s AS (
+            %s %s AS (
                 SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), %s), 3857), %s) geom
-            )
+            ),
             """ % (
+                "WITH" if first else "",
                 subset.id + "_radius",
                 subset.location[0],
                 subset.location[1],
                 subset.location[2],
-                subset.distance.value
+                subset.distance.get_meters()
+
             )
 
             sql += """
-            WITH %s AS (
-                SELECT %s.way, %s, %s
+            %s AS (
+                SELECT %s.way FROM %s, %s
                 WHERE way IS NOT NULL AND
                     NOT ST_IsEmpty(way) AND
                     ST_Intersects(way, %s.geom)
-                    AND %s LIKE '%s';
+                    AND %s LIKE '%s'
             )
             """ % (
                 subset.id,
@@ -82,7 +87,7 @@ class OSMTable(GeoDataset):
                 self.map_keyword_to_tags(subset.search_query.search)[0],
                 self.map_keyword_to_tags(subset.search_query.search)[1]
             )
-
+            first = False
         return sql
 
     def get_location_sql(self):
