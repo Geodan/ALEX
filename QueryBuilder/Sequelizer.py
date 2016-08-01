@@ -1,5 +1,6 @@
 import config
 import logging
+import geojson
 
 import Arguments
 import Commands
@@ -281,7 +282,7 @@ class Sequelizer(object):
 
         sql += "SELECT "
         for subset in databindings[0]:
-            sql += "%s.way" % (subset.id)
+            sql += "ST_AsGeoJSON(%s.way)" % (subset.id)
 
         sql += " FROM "
 
@@ -290,13 +291,21 @@ class Sequelizer(object):
 
         sql += ";"
 
-        print(sql)
+        return {'type': 'result', 'result': sql}
 
-    def get_geojson(self, results, context):
-        pass
+    def get_geojson(self, sql, context):
+        result = self.db.query(sql).getresult()
+        geo_objects = []
+
+        for polygon in result:
+            polygon = polygon[0]
+            geo_objects.append(geojson.Feature(geometry=geojson.loads(polygon)))
+
+        return {'type': 'result', 'result': geojson.dumps(geojson.FeatureCollection(geo_objects))}
 
     def __init__(self,
                 databases,
+                db,
                 cf=None,
                 dsf=None,
                 lbf=None,
@@ -305,6 +314,7 @@ class Sequelizer(object):
                 ):
 
         self.databases = databases
+        self.db = db
         if not cf:
             self.fn_classify = self.classify
         if not dsf:
@@ -373,10 +383,10 @@ class Sequelizer(object):
 
         sql = self.fn_to_sql(logical_sentence["result"], context)
 
-        # TODO Check SQL results
+        print(sql)
 
-        geojson = self.fn_get_geojson(sql, context)
+        geojson = self.fn_get_geojson(sql["result"], context)
 
         # TODO Check geojson result
 
-        return {'type':'result', 'result':None}
+        return {'type':'result', 'result': geojson["result"]}
