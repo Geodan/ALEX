@@ -1,8 +1,15 @@
 import flask
 import Sequelizer
+from nlq import Datasets
+from pg import DB
 
 app = flask.Flask(__name__)
-sequelizer = Sequelizer.Sequelizer()
+
+db = DB(dbname='gis', host='localhost', port=5432)
+#nit__(self, content, table):
+osm_buildings = Datasets.OSMPolygonTable()
+#osm_roads = Datasets.OSMLinesTable()
+sequelizer = Sequelizer.Sequelizer([osm_buildings], db)
 
 @app.route("/")
 def index():
@@ -34,11 +41,9 @@ def query():
         if "location" in json_data:
             location = json_data["location"]
 
-        geojson = sequelizer.handle_request(json_data["sentence"], location)
+        result = sequelizer.handle_request(json_data["sentence"], location)
 
-        flask_response = {
-            'result': geojson
-        }
+        flask_response = result
 
         return flask.jsonify(flask_response)
 

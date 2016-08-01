@@ -1,4 +1,4 @@
-from WordGroup import WordGroup
+from .WordGroup import WordGroup
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 
@@ -21,9 +21,6 @@ class Argument(WordGroup):
     def __init__(self, word, type):
         super().__init__(word)
         self.type = type
-
-    def sequelize(self, arguments, sentence, current_index):
-        return ""
 
 class Location(Argument):
 

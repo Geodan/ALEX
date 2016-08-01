@@ -1,9 +1,10 @@
 import config
 import logging
+import geojson
 
-from Sentence import Sentence
+from nlq import Arguments, Commands, Filters, Logic
+from nlq.Sentence import Sentence
 from wit import Wit
-from pg import DB
 
 #TODO document these methods
 
@@ -27,14 +28,12 @@ actions = {
     'error': error,
 }
 
-db = DB(dbname='gis', host='localhost', port=5432)
-
 client = Wit(config.wit_token, actions)
 
 class Sequelizer(object):
 
 
-    def classify(self, sentence):
+    def classify(self, sentence, context):
         try:
             resp = client.converse('geobot-session-5', sentence, {})
         except:
@@ -42,30 +41,276 @@ class Sequelizer(object):
         original_sentence = sentence.lower().strip()
         sentence_object = Sentence(original_sentence, resp)
 
+        # Best place to find the command and store it in the context
+        for index, lang_object in enumerate(sentence_object.nlp_parts):
+            if type(lang_object) == Commands.Command:
+                if "command" in context:
+                    return {'type':'error', 'error_code': 1, 'error_message': 'Two commands are not supported'}
+                context["command"] = lang_object
+                del sentence_object.nlp_parts[index]
+
+        context["sentence"] = sentence_object
         return {'type': 'result', 'result': sentence_object.nlp_parts}
 
+    def identify_datasets(self, language_objects, context):
+
+        new_sentence = []
+
+        # Current filter object
+        filter_obj = None
+
+        # The argument types the filter takes
+        arg_header = []
+
+        # The argument types the filter can optionally take extra
+        opt_arg_header = []
+
+        # Current argument stack
+        arguments = []
+
+        # Current optional argument stack
+        optional_arguments = []
+
+        # Do we have to clean up?
+        cleanup = False
+
+        context["search"] = None
+        context["last_type"] = None
+        context["datasets"] = []
+
+        index = 0
+
+        # Check all language_objects
+        for lang_object in language_objects:
+
+            obj_type = type(lang_object)
+
+            if cleanup:
+                new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+                new_sentence.append(new_dataset)
+                context["datasets"].append(new_dataset)
+                data
+                filter_obj = None
+                arg_header = []
+                opt_arg_header = []
+                arguments = []
+                optional_arguments = []
+                cleanup = False
 
 
-    def identify_datasets(self, language_objects):
-        pass
+            # We found something to search for :D!
+            if obj_type == Arguments.SearchQuery:
+
+                # Lets store it for now
+                context["search_index"] = index
+                context["search"] = lang_object
+
+            elif issubclass(obj_type, Arguments.Argument):
+                if not filter_obj:
+                    return {'type':'error', 'error_code': 1, 'error_message': 'Argument before filter'}
+
+                # If there are still arguments left
+                if len(arg_header) > 0:
+
+                    # And it is the right type
+                    if arg_header[0] == obj_type:
+
+                        #Take it!
+                        arg_header.pop(0)
+                        arguments.append(lang_object)
+
+                        #If its the last word and there are no arguments left
+                        if index == (len(language_objects) - 1) and len(arg_header) == 0:
+                            # Its done :)
+                            cleanup = True
+
+                    else:
+                        # Otherwise its a malformed sentence
+                        return {'type':'error', 'error_code': 1, 'error_message': 'Needed arg not found'}
+
+                # Maybe there is an optional argument left?
+                elif len(opt_arg_header) > 0:
+
+                    # If it is what we are searching for
+                    if opt_arg_header[0] == obj_type:
+
+                        #Store it
+                        optional_arguments.pop(0)
+                        optional_arguments.append(lang_object)
+
+                        #If its the last word and there are no optional arguments left
+                        if index == (len(language_objects) - 1) and len(opt_arg_header) == 0:
+                            # Its done :)
+                            cleanup = True
+                    else:
+                        # Its done :)
+                        cleanup = True
+
+                else:
+                    cleanup = True
+
+
+            # Its a filter!
+            elif issubclass(obj_type, Filters.Filter) and obj_type != Filters.ReferenceFilter:
+
+                # Maybe we are still undergoing some argument hunting?
+                if filter_obj:
+
+                    # If old filter can't be done
+                    if len(arg_header) != 0:
+
+                        # if so, malformed sentence
+                        return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
+                    else:
+                        new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+                        new_sentence.append(new_dataset)
+                        context["datasets"].append(new_dataset)
+
+                        filter_obj = None
+                        arg_header = []
+                        opt_arg_header = []
+                        arguments = []
+                        optional_arguments = []
+
+
+                # And if we don't know what to search for, its a malformed sentence too
+                if not "search" in context:
+                    return {'type':'error', 'error_code': 1, 'error_message': 'Filter without search query'}
+
+
+                # Lets hunt for these arguments!
+                filter_obj = lang_object
+                arg_header = lang_object.arguments
+                opt_arg_header = lang_object.optional_arguments
+
+
+            else:
+                # If old filter can't be done
+                if len(arg_header) != 0:
+
+                    # if so, malformed sentence
+                    return {'type':'error', 'error_code': 1, 'error_message': 'new filter while old not done'}
+                else:
+                    if filter_obj:
+                        new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+                        new_sentence.append(new_dataset)
+                        context["datasets"].append(new_dataset)
+
+                        filter_obj = None
+                        arg_header = []
+                        opt_arg_header = []
+                        arguments = []
+                        optional_arguments = []
+                # The next step needs this information, so lets give it
+                new_sentence.append(lang_object)
+
+            index += 1
+
+        # One last cleanup ey? :)
+        if cleanup:
+            new_dataset = filter_obj.get_dataset(context, context["search"], arguments, optional_arguments)
+            new_sentence.append(new_dataset)
+            context["datasets"].append(new_dataset)
+
+            filter_obj = None
+            arg_header = []
+            opt_arg_header = []
+            arguments = []
+            optional_arguments = []
+
+        if filter_obj:
+            print(filter_obj)
+            return {'type':'error', 'error_code': 1, 'error_message': 'Filter not done after sentence'}
+        return {'type': 'result', 'result': (new_sentence, context["datasets"])}
 
     #TODO better name for semi query
-    def logical_bindings(self, semi_query):
-        pass
+    def logical_bindings(self, semi_query, datasets, context):
 
-    def to_sql_and_run(self, logical_sentence):
-        pass
+        bindings = []
+        for index, query_object in enumerate(semi_query):
+            obj_type = type(query_object)
 
-    def convert_to_geojson(self, results):
-        pass
+            # If it is a binding
+            if issubclass(obj_type, Logic.Binding):
+
+                # If its the first or the last, it cant bind
+                if index != 0 and index != (len(semi_query) - 1):
+
+                    # The one before is our first set
+                    query_object.one = index - 1
+
+                    # Check if it is negated after where there are not etc.
+                    if issubclass(type(semi_query[index + 1]), Logic.Inverter):
+
+                        #Its inverted :D
+                        query_object.inverted = True
+
+                        # Check two spaces after, if we can
+                        if index != (len(semi_query - 2)):
+
+                            # Set the relativity of the second set
+                            query_object.two = index + 2
+                            semi_query[index + 2].relative = True
+                            semi_query[index + 2].relative_to = semi_query[index - 1]
+                        else:
+                            #TODO ERROR
+                            pass
+                    else:
+                        query_object.two = index + 1
+                        semi_query[index + 1].relative = True
+                        semi_query[index + 1].relative_to = semi_query[index - 1]
+                    bindings.append(query_object)
+            else:
+                #TODO ERROR
+                pass
+
+        return {'type': 'result', 'result': (datasets, bindings)}
+
+    def to_sql(self, databindings, context):
+
+        # Only test SQLization. The real parts are going to be put
+        # in the SQLQuery.py file
+
+        sql = ""
+        for subset in databindings[0]:
+            if not subset.relative:
+                sql += self.databases[0].get_subset(subset)
+
+        sql += "SELECT "
+        for subset in databindings[0]:
+            sql += "ST_AsGeoJSON(%s.way)" % (subset.id)
+
+        sql += " FROM "
+
+        for subset in databindings[0]:
+            sql += "%s" % (subset.id)
+
+        sql += ";"
+
+        return {'type': 'result', 'result': sql}
+
+    def get_geojson(self, sql, context):
+        result = self.db.query(sql).getresult()
+        geo_objects = []
+
+        for polygon in result:
+            polygon = polygon[0]
+            geo_objects.append(geojson.Feature(geometry=geojson.loads(polygon)))
+
+        return {'type': 'result', 'result': geojson.dumps(geojson.FeatureCollection(geo_objects))}
 
     def __init__(self,
+                databases,
+                db,
                 cf=None,
                 dsf=None,
                 lbf=None,
                 sqlf=None,
                 geojf=None
                 ):
+
+        self.databases = databases
+        self.db = db
         if not cf:
             self.fn_classify = self.classify
         if not dsf:
@@ -73,16 +318,22 @@ class Sequelizer(object):
         if not lbf:
             self.fn_logical_bindings = self.logical_bindings
         if not sqlf:
-            self.fn_to_sql_and_run = self.to_sql_and_run
+            self.fn_to_sql = self.to_sql
         if not geojf:
-            self.fn_convert_to_geojson = self.convert_to_geojson
+            self.fn_get_geojson = self.get_geojson
 
-    def handle_request(self, sentence, location):
+    def handle_request(self, sentence, location=None):
         if type(sentence) != str:
             raise ValueError("Sentence is not a string")
 
-        language_objects = self.fn_classify(sentence)
-        print(language_objects)
+        context = {}
+
+        if location:
+            context["location"] = location
+
+        language_objects = self.fn_classify(sentence, context)
+
+        print(sentence)
 
         if not "type" in language_objects:
             logging.error("No type field in classification result")
@@ -96,20 +347,42 @@ class Sequelizer(object):
             logging.error("No field result in classification result while it is a result type?")
             return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
-        semi_query = self.fn_identify_dataset(language_objects["result"])
+        print(language_objects)
 
-        # TODO check dataset result
+        semi_query = self.fn_identify_dataset(language_objects["result"], context)
+        print(semi_query)
+        if not "type" in semi_query:
+            logging.error("No type field in dataset result")
+            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
 
-        logical_sentence = self.fn_logical_bindings(semi_query)
+        if semi_query["type"] == "error":
+            logging.error(semi_query["error_message"])
+            return semi_query # Error to client
 
-        # TODO check logical bindings
+        if not "result" in semi_query:
+            logging.error("No field result in dataset result while it is a result type?")
+            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
 
-        sql_results = self.fn_to_sql_and_run(logical_sentence)
+        logical_sentence = self.fn_logical_bindings(semi_query["result"][0], semi_query["result"][1], context)
+        print(logical_sentence)
+        if not "type" in logical_sentence:
+            logging.error("No type field in dataset result")
+            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
 
-        # TODO Check SQL results
+        if logical_sentence["type"] == "error":
+            logging.error(logical_sentence["error_message"])
+            return logical_sentence # Error to client
 
-        geojson = self.fn_convert_to_geojson(sql_results)
+        if not "result" in logical_sentence:
+            logging.error("No field result in dataset result while it is a result type?")
+            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
+
+        sql = self.fn_to_sql(logical_sentence["result"], context)
+
+        print(sql)
+
+        geojson = self.fn_get_geojson(sql["result"], context)
 
         # TODO Check geojson result
 
-        return geojson
+        return {'type':'result', 'result': geojson["result"]}
