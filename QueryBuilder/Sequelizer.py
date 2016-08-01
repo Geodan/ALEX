@@ -2,12 +2,8 @@ import config
 import logging
 import geojson
 
-import Arguments
-import Commands
-import Filters
-import Logic
-
-from Sentence import Sentence
+from nlq import Arguments, Commands, Filters, Logic
+from nlq.Sentence import Sentence
 from wit import Wit
 
 #TODO document these methods

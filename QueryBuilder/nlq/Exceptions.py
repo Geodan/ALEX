@@ -1,0 +1,2 @@
+class MalformedSentenceException(Exception):
+    pass

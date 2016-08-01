@@ -1,6 +1,6 @@
 import flask
 import Sequelizer
-import Datasets
+from nlq import Datasets
 from pg import DB
 
 app = flask.Flask(__name__)
