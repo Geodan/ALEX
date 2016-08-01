@@ -7,9 +7,9 @@ app = flask.Flask(__name__)
 
 db = DB(dbname='gis', host='localhost', port=5432)
 #nit__(self, content, table):
-osm_buildings = Datasets.OSMPolygonTable(db)
+osm_buildings = Datasets.OSMPolygonTable()
 #osm_roads = Datasets.OSMLinesTable()
-sequelizer = Sequelizer.Sequelizer([osm_buildings])
+sequelizer = Sequelizer.Sequelizer([osm_buildings], db)
 
 @app.route("/")
 def index():
