@@ -19,8 +19,7 @@ def StatisticalModel(object):
 
 class GeoDataset(object):
 
-    def __init__(self, db_name, conn, content, table, columns=None):
-        self.conn = conn
+    def __init__(self, db_name, content, table, columns=None):
         self.db_name = db_name.lower()
         self.content = content
         self.table = table
@@ -44,8 +43,8 @@ class GeoDataset(object):
 
 class OSMTable(GeoDataset):
 
-    def __init__(self, conn, content, table, columns):
-        super().__init__("OSM", conn, content, table, columns)
+    def __init__(self, content, table, columns):
+        super().__init__("OSM", content, table, columns)
 
     def get_subset(self, subset):
         subset_type = type(subset)
@@ -96,10 +95,9 @@ class OSMTable(GeoDataset):
 
 class OSMPolygonTable(OSMTable):
 
-    def __init__(self, conn):
+    def __init__(self):
         super().__init__(
             "lines",
-            conn,
             "planet_osm_polygon",
             [
                 "building",
@@ -116,10 +114,9 @@ class OSMPolygonTable(OSMTable):
 
 class OSMLinesTable(OSMTable):
 
-    def __init__(self, conn):
+    def __init__(self):
         super().__init__(
             "areas",
-            conn,
             "planet_osm_line",
             [
                 "railway",
