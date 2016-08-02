@@ -94,7 +94,7 @@ class Sentence:
                 nlp_parts.append(Arguments.Distance(str(word["value"]), word["unit"]))
             elif word["type"] == "command":
                 nlp_parts.append(Commands.Command(word["value"]))
-            elif word["type"] == "location":
+            elif word["type"] == "reference" or word["type"] == "location":
                 nlp_parts.append(Arguments.Location(word["value"]))
             elif word["type"] == "logic_operator":
                 nlp_parts.append(Logic.LogicOperator(word["value"]))

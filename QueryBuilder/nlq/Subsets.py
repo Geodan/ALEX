@@ -24,7 +24,6 @@ class RadiusSubset(Subset):
         else:
             self.location = context["location"]
 
-
     def is_valid(self):
         return self.search_query and self.distance and self.location
 
@@ -32,17 +31,15 @@ class RadiusSubset(Subset):
         return "RadiusSubset: %s within %s from %s" % (self.search_query, self.distance, self.location)
 
 
-class GeomSubset(Subset):
+class PolygonSubset(Subset):
 
     def __init__(self,
-                search_query=None,
-                geom=None,
-                dataset=None
+                extraction,
+                context
                 ):
-        self.search_query = search_query
-        self.geom = geom
-        self.dataset = dataset
-
+        super().__init__()
+        self.search_query = extraction["sq"]
+        self.polygon_name = extraction["polygon_name"].text
 
     def is_valid(self):
-        return self.search_query and self.geom and self.dataset
+        return self.search_query and self.geom

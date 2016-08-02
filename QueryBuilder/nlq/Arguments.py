@@ -26,6 +26,7 @@ class Location(Argument):
 
     def __init__(self, word):
         super().__init__(word, Type.Location)
+        self.text = " ".join(self.words)
 
     def __str__(self):
         return "Location: " + " ".join(self.words)
