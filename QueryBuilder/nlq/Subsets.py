@@ -13,20 +13,20 @@ class Subset:
 class RadiusSubset(Subset):
 
     def __init__(self,
-                search_query=None,
-                distance=None,
-                location=None,
-                dataset=None
+                    extraction,
+                    context
                 ):
         super().__init__()
-        self.search_query = search_query
-        self.distance = distance
-        self.location = location
-        self.dataset = dataset
+        self.search_query = extraction["sq"]
+        self.distance = extraction["distance"]
+        if "location" in extraction:
+            self.location = extraction["location"]
+        else:
+            self.location = context["location"]
 
 
     def is_valid(self):
-        return self.search_query and self.distance and self.location and self.dataset
+        return self.search_query and self.distance and self.location
 
     def __str__(self):
         return "RadiusSubset: %s within %s from %s" % (self.search_query, self.distance, self.location)
