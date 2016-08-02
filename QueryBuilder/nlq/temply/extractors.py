@@ -64,8 +64,11 @@ class WordTypeTemplateExtractor(object):
                     to_add = template[2](extraction, context)
                     new_list.append(to_add)
                     result.append(to_add)
+                obj_index += 1
 
             if not templated:
                 new_list.append(old_objects[obj_index])
+
+
 
         return (result, new_list)
