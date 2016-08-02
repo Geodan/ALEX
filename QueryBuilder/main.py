@@ -1,5 +1,5 @@
 import flask
-import Sequelizer
+import ProcessManager
 from nlq import Datasets
 from pg import DB
 
@@ -9,7 +9,7 @@ db = DB(dbname='gis', host='localhost', port=5432)
 #nit__(self, content, table):
 osm_buildings = Datasets.OSMPolygonTable()
 #osm_roads = Datasets.OSMLinesTable()
-sequelizer = Sequelizer.Sequelizer([osm_buildings], db)
+process_manager = ProcessManager.ProcessManager([osm_buildings], db)
 
 @app.route("/")
 def index():
@@ -41,7 +41,7 @@ def query():
         if "location" in json_data:
             location = json_data["location"]
 
-        result = sequelizer.handle_request(json_data["sentence"], location)
+        result = process_manager.handle_request(json_data["sentence"], location)
 
         flask_response = result
 
