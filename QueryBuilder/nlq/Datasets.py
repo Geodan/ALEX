@@ -46,21 +46,39 @@ class OSMTable(GeoDataset):
     def __init__(self, content, table, columns):
         super().__init__("OSM", content, table, columns)
 
+    def get_location_sql(self):
+        return "ST_Centroid(way)"
+
+
+class OSMPolygonTable(OSMTable):
+
+    def __init__(self):
+        super().__init__(
+            "lines",
+            "planet_osm_polygon",
+            [
+                "building",
+                "amenity",
+                "leisure",
+                "highway",
+                "name",
+                "way"
+            ]
+        )
+
     def get_subset(self, subset):
+
         subset_type = type(subset)
         sql = ""
         if subset.relative:
             return ""
 
-        # Only the first static dataset gets 'WITH'
-        first = True
         if subset_type == Subsets.RadiusSubset:
             sql += """
-            %s %s AS (
+            WITH %s AS (
                 SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), %s), 3857), %s) geom
             ),
             """ % (
-                "WITH" if first else "",
                 subset.id + "_radius",
                 subset.location[0],
                 subset.location[1],
@@ -86,28 +104,45 @@ class OSMTable(GeoDataset):
                 self.map_keyword_to_tags(subset.search_query.search)[0],
                 self.map_keyword_to_tags(subset.search_query.search)[1]
             )
-            first = False
+
+        elif subset_type == Subsets.PolygonSubset:
+            sql += """
+            WITH %s AS (
+                SELECT way FROM planet_osm_polygon
+                WHERE way IS NOT NULL AND
+                    NOT ST_IsEmpty(way) AND
+                    admin_level='10' AND
+                    LOWER(name) LIKE '%s'
+                    LIMIT 1
+            ),
+            """ % (
+                subset.id + "_geom",
+                subset.polygon_name
+            )
+
+            sql += """
+            %s AS (
+                SELECT %s.way FROM %s, %s
+                WHERE %s.way IS NOT NULL AND
+                    NOT ST_IsEmpty(%s.way) AND
+                    ST_Intersects(%s.way, %s.way)
+                    AND %s LIKE '%s'
+            )
+            """ % (
+                subset.id,
+                self.table,
+                self.table,
+                subset.id + "_geom",
+                self.table,
+                self.table,
+                self.table,
+                subset.id + "_geom",
+                self.map_keyword_to_tags(subset.search_query.search)[0],
+                self.map_keyword_to_tags(subset.search_query.search)[1]
+            )
+
+
         return sql
-
-    def get_location_sql(self):
-        return "ST_Centroid(way)"
-
-
-class OSMPolygonTable(OSMTable):
-
-    def __init__(self):
-        super().__init__(
-            "lines",
-            "planet_osm_polygon",
-            [
-                "building",
-                "amenity",
-                "leisure",
-                "highway",
-                "name",
-                "way"
-            ]
-        )
 
     def map_keyword_to_tags(self, word):
         return (("building", word))
