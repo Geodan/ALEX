@@ -33,6 +33,7 @@ class ProcessManager(object):
     def classify(self, sentence, context):
         try:
             resp = client.converse('geobot-session-5', sentence, {})
+            print(resp)
         except:
             return {'type': 'error', 'error_code': 1, 'error_message':'Wit returned an error'}
         original_sentence = sentence.lower().strip()
@@ -160,6 +161,12 @@ class ProcessManager(object):
             [Arguments.SearchQuery, Filters.RadiusFilter, Arguments.Distance],
             [(0, 'sq'), (2, 'distance')],
             Subsets.RadiusSubset
+        )
+
+        self.extractor.add_template(
+            [Arguments.SearchQuery, Filters.RadiusFilter, Arguments.Location],
+            [(0, 'sq'), (2, 'polygon_name')],
+            Subsets.PolygonSubset
         )
 
     def handle_request(self, sentence, location=None):
