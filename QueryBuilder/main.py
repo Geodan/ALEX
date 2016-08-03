@@ -1,6 +1,6 @@
 import flask
 import ProcessManager
-from nlq import Datasets
+from nlq.sql import Datasets
 from pg import DB
 
 app = flask.Flask(__name__)
