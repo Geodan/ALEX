@@ -28,7 +28,7 @@ class SQLQuery(object):
         if not clauses:
             clauses = []
 
-        self.alias = alias
+        self.alias = str(alias)
         self.attributes = attributes
         self.tables = tables
         self.clauses = clauses
@@ -49,17 +49,19 @@ class SQLQuery(object):
                 sql += ", "
             sql += attr
 
-        sql += " FROM "
+        if self.tables and len(self.tables) > 0:
+            sql += " FROM "
 
-        for i, table in enumerate(self.tables):
-            if i > 0:
-                sql += ", "
-            sql += table
+            for i, table in enumerate(self.tables):
+                if i > 0:
+                    sql += ", "
+                sql += table
 
-        sql += " WHERE "
+        if self.clauses and len(self.clauses) > 0:
+            sql += " WHERE "
 
-        for i, clause in enumerate(self.clauses):
-            sql += clause
+            for i, clause in enumerate(self.clauses):
+                sql += clause
 
         if self.alias:
             sql += ")"

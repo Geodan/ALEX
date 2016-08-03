@@ -1,5 +1,6 @@
 from enum import Enum
 from . import Subsets
+from .sql.SQLQuery import SQLQuery
 
 # Maybe useful later on
 class ConnectionTypes(Enum):
@@ -10,7 +11,6 @@ class DatasetCombiner(object):
 
     def __init__(self, datasets):
         pass
-
 
 def StatisticalModel(object):
 
@@ -36,25 +36,22 @@ class GeoDataset(object):
     def map_keyword_to_tags(self, word):
         raise NotImplementedError
 
-    def get_location_sql(self):
+    def get_geometry_table(self):
         raise NotImplementedError
-
-
 
 class OSMTable(GeoDataset):
 
     def __init__(self, content, table, columns):
         super().__init__("OSM", content, table, columns)
 
-    def get_location_sql(self):
-        return "ST_Centroid(way)"
-
+    def get_geometry_table(self):
+        return "way"
 
 class OSMPolygonTable(OSMTable):
 
     def __init__(self):
         super().__init__(
-            "lines",
+            "polygons",
             "planet_osm_polygon",
             [
                 "building",
@@ -74,36 +71,43 @@ class OSMPolygonTable(OSMTable):
             return ""
 
         if subset_type == Subsets.RadiusSubset:
-            sql += """
-            WITH %s AS (
-                SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), %s), 3857), %s) geom
-            ),
-            """ % (
-                subset.id + "_radius",
-                subset.location[0],
-                subset.location[1],
-                subset.location[2],
-                subset.distance.get_meters()
 
+            inf = {
+                'lon': subset.location[0],
+                'lat': subset.location[1],
+                'proj': subset.location[2],
+                'dist':subset.distance.get_meters()
+            }
+            geom = SQLQuery(alias=str(subset.id) + "_radius")
+            geom.attributes.append(
+                "ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint({lon}, {lat}), {proj}), 3857), {dist}) geom"
             )
 
-            sql += """
-            %s AS (
-                SELECT %s.way FROM %s, %s
-                WHERE way IS NOT NULL AND
-                    NOT ST_IsEmpty(way) AND
-                    ST_Intersects(way, %s.geom)
-                    AND %s LIKE '%s'
-            )
-            """ % (
-                subset.id,
-                self.table,
-                self.table,
-                subset.id + "_radius",
-                subset.id + "_radius",
-                self.map_keyword_to_tags(subset.search_query.search)[0],
-                self.map_keyword_to_tags(subset.search_query.search)[1]
-            )
+            sql = geom.to_string(inf)
+            sql += ', '
+
+            tags = self.map_keyword_to_tags(subset.search_query.search)
+            inf = inf = {
+                'selection' : self.table + '.way',
+                'table': self.table,
+                'radius': subset.id + "_radius"
+            }
+            subset_sql = SQLQuery(alias=subset.id)
+            subset_sql.attributes.append("{selection}")
+            subset_sql.tables.append("{table}")
+            subset_sql.tables.append("{radius}")
+            subset_sql.clauses.append("{selection} IS NOT NULL AND ")
+            subset_sql.clauses.append("NOT ST_isEmpty({selection}) AND ")
+            subset_sql.clauses.append("ST_Intersects({selection}, {radius}.geom)")
+
+            print(tags)
+            for i, tag in enumerate(tags):
+                print("TAG", tag)
+                inf["tag" + str(i)] = str(tag[0])
+                inf["keyword" + str(i)] = str(tag[1])
+                subset_sql.clauses.append(" AND {tag%d}='{keyword%d}'" % (i,i))
+
+            sql += subset_sql.to_string(inf, with_with=False)
 
         elif subset_type == Subsets.PolygonSubset:
             sql += """
@@ -145,13 +149,13 @@ class OSMPolygonTable(OSMTable):
         return sql
 
     def map_keyword_to_tags(self, word):
-        return (("building", word))
+        return [("building", word)]
 
 class OSMLinesTable(OSMTable):
 
     def __init__(self):
         super().__init__(
-            "areas",
+            "lines",
             "planet_osm_line",
             [
                 "railway",
