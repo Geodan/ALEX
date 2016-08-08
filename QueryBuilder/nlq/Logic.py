@@ -1,5 +1,6 @@
 from .WordGroup import WordGroup
 
+
 class LogicOperator(WordGroup):
 
     """
@@ -12,6 +13,7 @@ class LogicOperator(WordGroup):
     def __str__(self):
         return "LogicOperator: " + " ".join(self.words)
 
+
 class Inverter(WordGroup):
 
     """
@@ -23,6 +25,7 @@ class Inverter(WordGroup):
 
     def __str__(self):
         return "Inverter: " + " ".join(self.words)
+
 
 class Binding(WordGroup):
 
@@ -38,6 +41,7 @@ class Binding(WordGroup):
 
     def bind(self, ds1, ds2):
         raise NotImplemented
+
 
 class ExistenceBinding(Binding):
 

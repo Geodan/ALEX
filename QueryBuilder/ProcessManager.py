@@ -7,15 +7,18 @@ from nlq.temply.extractors import WordTypeTemplateExtractor
 from nlq.Sentence import Sentence
 from wit import Wit
 
+
 # Needed for the wit.ai client for now :c
 def say(session_id, context, msg):
     print(msg)
+
 
 def merge(session_id, context, entities, msg):
     print("Session id", session_id)
     print("Context", context)
     print("entities", entities)
     print("msg",  msg)
+
 
 def error(session_id, context, e):
     print(str(e))
@@ -28,6 +31,7 @@ actions = {
 
 client = Wit(config.wit_token, actions)
 
+
 class ProcessManager(object):
 
     def classify(self, sentence, context):
@@ -35,7 +39,11 @@ class ProcessManager(object):
             resp = client.converse('geobot-session-5', sentence, {})
             print(resp)
         except:
-            return {'type': 'error', 'error_code': 1, 'error_message':'Wit returned an error'}
+            return {
+                'type': 'error',
+                'error_code': 1,
+                'error_message': 'Wit returned an error'
+            }
         original_sentence = sentence.lower().strip()
         sentence_object = Sentence(original_sentence, resp)
 
@@ -43,7 +51,11 @@ class ProcessManager(object):
         for index, lang_object in enumerate(sentence_object.nlp_parts):
             if type(lang_object) == Commands.Command:
                 if "command" in context:
-                    return {'type':'error', 'error_code': 1, 'error_message': 'Two commands are not supported'}
+                    return {
+                        'type': 'error',
+                        'error_code': 1,
+                        'error_message': 'Two commands are not supported'
+                    }
                 context["command"] = lang_object
                 del sentence_object.nlp_parts[index]
 
@@ -52,11 +64,13 @@ class ProcessManager(object):
 
     def identify_datasets(self, language_objects, context):
 
-        context["datasets"], new_sentence = self.extractor.extract_all_templates(language_objects, context)
+        datasets, new_sentence = self.extractor.extract_all_templates(
+            language_objects, context
+        )
+        context["datasets"] = datasets
+        return {'type': 'result', 'result': (new_sentence, datasets)}
 
-        return {'type': 'result', 'result': (new_sentence, context["datasets"])}
-
-    #TODO better name for semi query
+    # TODO better name for semi query
     def logical_bindings(self, semi_query, datasets, context):
 
         bindings = []
@@ -75,26 +89,32 @@ class ProcessManager(object):
                     # Check if it is negated after where there are not etc.
                     if issubclass(type(semi_query[index + 1]), Logic.Inverter):
 
-                        #Its inverted :D
+                        # Its inverted :D
                         query_object.inverted = True
 
                         # Check two spaces after, if we can
                         if index != (len(semi_query - 2)):
 
+                            # I plus two
+                            i_p_t = index + 2
+
                             # Set the relativity of the second set
-                            query_object.two = index + 2
-                            semi_query[index + 2].relative = True
-                            semi_query[index + 2].relative_to = semi_query[index - 1]
+                            query_object.two = plus_two
+
+                            semi_query[i_p_t].relative = True
+                            semi_query[i_p_t].relative_to = semi_query[i_p_t]
                         else:
-                            #TODO ERROR
+                            # TODO ERROR
                             pass
                     else:
-                        query_object.two = index + 1
-                        semi_query[index + 1].relative = True
-                        semi_query[index + 1].relative_to = semi_query[index - 1]
+                        # I plus one
+                        i_p_o = index + 1
+                        query_object.two = i_p_o
+                        semi_query[i_p_o].relative = True
+                        semi_query[i_p_o].relative_to = semi_query[i_p_o]
                     bindings.append(query_object)
             else:
-                #TODO ERROR
+                # TODO ERROR
                 pass
 
         return {'type': 'result', 'result': (datasets, bindings)}
@@ -126,21 +146,24 @@ class ProcessManager(object):
         result = self.db.query(sql).getresult()
         geo_objects = []
 
-        for polygon in result:
-            polygon = polygon[0]
-            geo_objects.append(geojson.Feature(geometry=geojson.loads(polygon)))
+        for poly in result:
+            poly = poly[0]
+            geo_objects.append(geojson.Feature(geometry=geojson.loads(poly)))
 
-        return {'type': 'result', 'result': geojson.dumps(geojson.FeatureCollection(geo_objects))}
+        return {
+            'type': 'result',
+            'result': geojson.dumps(geojson.FeatureCollection(geo_objects))
+        }
 
     def __init__(self,
-                databases,
-                db,
-                cf=None,
-                dsf=None,
-                lbf=None,
-                sqlf=None,
-                geojf=None
-                ):
+                 databases,
+                 db,
+                 cf=None,
+                 dsf=None,
+                 lbf=None,
+                 sqlf=None,
+                 geojf=None
+                 ):
 
         self.databases = databases
         self.db = db
@@ -182,47 +205,72 @@ class ProcessManager(object):
 
         print(sentence)
 
-        if not "type" in language_objects:
+        if "type" not in language_objects:
             logging.error("No type field in classification result")
-            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'Incorrect return type'
+            }
 
         if language_objects["type"] == "error":
             logging.error(language_objects["error_message"])
-            return language_objects # Error to client
+            return language_objects  # Error to client
 
-        if not "result" in language_objects:
-            logging.error("No field result in classification result while it is a result type?")
-            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
+        if "result" not in language_objects:
+            logging.error("No field result in classification result?")
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'No result in result'
+            }
 
         print(language_objects)
+        lang_obj_result = language_objects["result"]
+        semi_query = self.fn_identify_dataset(lang_obj_result, context)
 
-        semi_query = self.fn_identify_dataset(language_objects["result"], context)
-        print(semi_query)
-        if not "type" in semi_query:
+        if "type" not in semi_query:
             logging.error("No type field in dataset result")
-            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'Incorrect return type'
+            }
 
         if semi_query["type"] == "error":
             logging.error(semi_query["error_message"])
-            return semi_query # Error to client
+            return semi_query  # Error to client
 
-        if not "result" in semi_query:
-            logging.error("No field result in dataset result while it is a result type?")
-            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
+        if "result" not in semi_query:
+            logging.error("No field result in dataset result?")
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'No result in result'
+            }
 
-        logical_sentence = self.fn_logical_bindings(semi_query["result"][0], semi_query["result"][1], context)
+        sq_result = semi_query["result"]
+        logical_sentence = self.fn_logical_bindings(*sq_result, context)
         print(logical_sentence)
-        if not "type" in logical_sentence:
+        if "type" not in logical_sentence:
             logging.error("No type field in dataset result")
-            return {'type':'error', 'error_code': 5, 'error_message':'Incorrect return type'}
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'Incorrect return type'
+            }
 
         if logical_sentence["type"] == "error":
             logging.error(logical_sentence["error_message"])
-            return logical_sentence # Error to client
+            return logical_sentence  # Error to client
 
-        if not "result" in logical_sentence:
-            logging.error("No field result in dataset result while it is a result type?")
-            return {'type':'error', 'error_code': 5, 'error_message':'No result in result'}
+        if "result" not in logical_sentence:
+            logging.error("No field result in dataset result?")
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'No result in result'
+            }
 
         sql = self.fn_to_sql(logical_sentence["result"], context)
 
@@ -232,4 +280,7 @@ class ProcessManager(object):
 
         # TODO Check geojson result
 
-        return {'type':'result', 'result': geojson["result"]}
+        return {
+            'type': 'result',
+            'result': geojson["result"]
+        }

@@ -1,7 +1,10 @@
-import random, string
+import random
+import string
 
-def randomword(length):
-   return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
+
+def randomword(leng):
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(leng))
+
 
 class Subset:
 
@@ -10,12 +13,13 @@ class Subset:
         self.relative = False
         self.relative_to = None
 
+
 class RadiusSubset(Subset):
 
     def __init__(self,
-                    extraction,
-                    context
-                ):
+                 extraction,
+                 context
+                 ):
         super().__init__()
         self.search_query = extraction["sq"]
         self.distance = extraction["distance"]
@@ -28,15 +32,17 @@ class RadiusSubset(Subset):
         return self.search_query and self.distance and self.location
 
     def __str__(self):
-        return "RadiusSubset: %s within %s from %s" % (self.search_query, self.distance, self.location)
+        return "RadiusSubset: %s within %s from %s" % (
+            self.search_query, self.distance, self.location
+        )
 
 
 class PolygonSubset(Subset):
 
     def __init__(self,
-                extraction,
-                context
-                ):
+                 extraction,
+                 context
+                 ):
         super().__init__()
         self.search_query = extraction["sq"]
         self.polygon_name = extraction["polygon_name"].text

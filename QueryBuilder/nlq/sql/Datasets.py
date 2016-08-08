@@ -3,20 +3,24 @@ from .SQLQuery import SQLQuery
 from .utils import BasicSQLGenerator
 from .. import Subsets
 
+
 # Maybe useful later on
 class ConnectionTypes(Enum):
     SQL = 1
     HTTP = 2
+
 
 class DatasetCombiner(object):
 
     def __init__(self, datasets):
         pass
 
+
 def StatisticalModel(object):
 
     def __init__(self, dataset):
         self.dataset = dataset
+
 
 class GeoDataset(object):
 
@@ -56,7 +60,7 @@ class GeoDataset(object):
 
         tags = self.map_keyword_to_tags(subset.search_query.search)
         inf = inf = {
-            'selection' : self.table + '.way',
+            'selection': self.table + '.way',
             'table': self.table,
             'container': subset.id + "_container"
         }
@@ -67,12 +71,12 @@ class GeoDataset(object):
         subset_sql.tables.append("{container}")
         subset_sql.clauses.append("{selection} IS NOT NULL AND ")
         subset_sql.clauses.append("NOT ST_isEmpty({selection}) AND ")
-        subset_sql.clauses.append("ST_Intersects({selection}, {container}.way)")
+        subset_sql.clauses.append("ST_Intersects({selection},{container}.way)")
 
         for i, tag in enumerate(tags):
             inf["tag" + str(i)] = str(tag[0])
             inf["keyword" + str(i)] = str(tag[1])
-            subset_sql.clauses.append(" AND {tag%d}='{keyword%d}'" % (i,i))
+            subset_sql.clauses.append(" AND {tag%d}='{keyword%d}'" % (i, i))
 
         sql += subset_sql.to_string(inf, with_with=False)
 
@@ -84,6 +88,7 @@ class GeoDataset(object):
     def get_geometry_table(self):
         raise NotImplementedError
 
+
 class OSMTable(GeoDataset):
 
     def __init__(self, content, table, columns):
@@ -91,6 +96,7 @@ class OSMTable(GeoDataset):
 
     def get_geometry_table(self):
         return "way"
+
 
 class OSMPolygonTable(OSMTable):
 
@@ -110,6 +116,7 @@ class OSMPolygonTable(OSMTable):
 
     def map_keyword_to_tags(self, word):
         return [("building", word)]
+
 
 class OSMLinesTable(OSMTable):
 
@@ -134,5 +141,5 @@ class OSMLinesTable(OSMTable):
             return [("railway", "rail")]
         if word in ["railroad", "rail", "railway"]:
             return [("railway", "rail"), ("railway", "subway")]
-        if word in ["subway", "subway_rail","subway_line"]:
+        if word in ["subway", "subway_rail", "subway_line"]:
             return [("railway", "subway")]

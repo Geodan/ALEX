@@ -1,6 +1,6 @@
 from . import Filters
-
 from . import Logic
+
 
 class HardCodedLogicClassifier:
 
@@ -27,6 +27,7 @@ class HardCodedFilterClassifier:
         if words in reference:
             return Filters.ReferenceFilter(words)
 
+
 class HardCodedBindingClassifier:
 
     def classify(self, words, sentence, current_index, context=None):
@@ -37,4 +38,4 @@ class HardCodedBindingClassifier:
         if words in existence:
             return Logic.ExistenceBinding(words)
         if words in combine:
-            return None #Must be combinding :')
+            return None  # Must be combinding :')
