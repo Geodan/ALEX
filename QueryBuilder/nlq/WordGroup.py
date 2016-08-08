@@ -10,10 +10,10 @@ class WordGroup:
         sl = self.words
         l = wg.words
 
-        sll=len(sl)
-        for ind in (i for i,e in enumerate(l) if e==sl[0]):
-            if l[ind:ind+sll]==sl:
-                return ind,ind+sll-1
+        sll = len(sl)
+        for ind in (i for i, e in enumerate(l) if e == sl[0]):
+            if l[ind:ind+sll] == sl:
+                return ind, ind+sll-1
         return (-1, -1)
 
     def remove_n_words_from_front(self, n):
@@ -23,7 +23,6 @@ class WordGroup:
         else:
             self.words = []
             self.sentence = "".join(self.words)
-
 
     def trim_next_word_off_sentence(self, pos):
 
@@ -69,7 +68,7 @@ class WordGroup:
                 result.append(next_word)
             words = self.trim_next_word_off_sentence(words)
         return result
-        
+
 
 if __name__ == "__main__":
     wg = WordGroup("This class creates a word group from a string")
