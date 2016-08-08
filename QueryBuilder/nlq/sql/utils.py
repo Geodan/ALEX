@@ -8,7 +8,7 @@ class BasicSQLGenerator(object):
             'lon': location[0],
             'lat': location[1],
             'proj': location[2],
-            'dist':distance.get_meters()
+            'dist': distance.get_meters()
         }
         geom = SQLQuery(alias=name)
         geom.attributes.append(
