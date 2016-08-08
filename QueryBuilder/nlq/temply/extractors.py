@@ -50,9 +50,9 @@ class WordTypeTemplateExtractor(object):
                         mistake_found = True
                         break
 
-                    for extract_index, argument in enumerate(template[1]):
-                        if argument[0] == i:
-                            extraction[argument[1]] = old_objects[obj_index + i]
+                    for extract_index, arg in enumerate(template[1]):
+                        if arg[0] == i:
+                            extraction[arg[1]] = old_objects[obj_index + i]
 
                     counter += 1
 
@@ -67,12 +67,9 @@ class WordTypeTemplateExtractor(object):
                     result.append(to_add)
                     break
 
-
             if not templated:
                 print(len(old_objects), obj_index)
                 new_list.append(old_objects[obj_index])
                 obj_index += 1
-
-
 
         return (result, new_list)
