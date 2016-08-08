@@ -6,10 +6,11 @@ from pg import DB
 app = flask.Flask(__name__)
 
 db = DB(dbname='gis', host='localhost', port=5432)
-#nit__(self, content, table):
+# nit__(self, content, table):
 osm_buildings = Datasets.OSMPolygonTable()
-#osm_roads = Datasets.OSMLinesTable()
+# osm_roads = Datasets.OSMLinesTable()
 process_manager = ProcessManager.ProcessManager([osm_buildings], db)
+
 
 @app.route("/")
 def index():
@@ -18,6 +19,7 @@ def index():
 
     """
     return flask.render_template("index.html")
+
 
 @app.route("/parse_and_run_query", methods=['GET', 'POST'])
 def query():
@@ -33,15 +35,18 @@ def query():
 
         json_data = flask.request.get_json(force=True)
 
-        if not "sentence" in json_data:
-            return flask.jsonify({"error_code": 0, "error_message": "No sentence given"})
+        if "sentence" not in json_data:
+            return flask.jsonify({
+                "error_code": 0,
+                "error_message": "No sentence given"
+            })
 
-        location = None
+        loc = None
 
         if "location" in json_data:
-            location = json_data["location"]
+            loc = json_data["location"]
 
-        result = process_manager.handle_request(json_data["sentence"], location)
+        result = process_manager.handle_request(json_data["sentence"], loc)
 
         flask_response = result
 
