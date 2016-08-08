@@ -1,21 +1,3 @@
-# class MultipartSQLQuery(object):
-#
-#     def __init__(self, sql_queries):
-#         self.sql_queries = sql_queries
-#
-#     def to_string(self):
-#         sql = ""
-#         for index, query in enumerate(self.sql_queries):
-#             if index > 0 and self.sql_queries[index - 1].alias != None:
-#                 sql += query.to_string(with_with=False)
-#             elif query.alias != None:
-#                 sql += query.to_string(with_with=True)
-#             else:
-#                 sql += query.to_string(with_with=False)
-#
-#         return sql
-#
-
 class SQLQuery(object):
 
     # All lists of arguments
@@ -87,11 +69,11 @@ if __name__ == "__main__":
     a.tables.append("planet_osm_polygon")
     a.clauses.append("NOT ST_EMPTY({dep1})")
 
-    b  = SQLQuery()
+    b = SQLQuery()
 
     b.attributes.append("way")
     b.tables.append("planet_osm_polygon")
     b.clauses.append("blablabla")
 
-    print(a.to_string({'dep1':'way'}))
+    print(a.to_string({'dep1': 'way'}))
     print(b.to_string({}))
