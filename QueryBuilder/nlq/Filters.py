@@ -2,10 +2,13 @@ from . import Arguments
 from . import Subsets
 from .Exceptions import MalformedSentenceException
 from .WordGroup import WordGroup
-import random, string
+import random
+import string
 
-def randomword(length):
-   return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
+
+def randomword(leng):
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(leng))
+
 
 class Filter(WordGroup):
 
@@ -17,6 +20,7 @@ class Filter(WordGroup):
         super().__init__(words)
         self.arguments = args
         self.optional_arguments = optional_args
+
 
 class RadiusFilter(Filter):
 
