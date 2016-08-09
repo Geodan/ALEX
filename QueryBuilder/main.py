@@ -1,5 +1,7 @@
+
 import flask
 import ProcessManager
+import crossorigin
 from nlq.sql import Datasets
 from pg import DB
 
@@ -21,7 +23,8 @@ def index():
     return flask.render_template("index.html")
 
 
-@app.route("/parse_and_run_query", methods=['GET', 'POST'])
+@app.route("/parse_and_run_query", methods=['GET', 'POST', 'OPTIONS'])
+@crossorigin.crossdomain(origin="*", headers="Content-Type")
 def query():
     """
     Parses the given sentence and returns the corresponding geodata
@@ -32,7 +35,7 @@ def query():
     """
 
     if flask.request.method == 'POST':
-
+        print("yo")
         json_data = flask.request.get_json(force=True)
 
         if "sentence" not in json_data:
@@ -60,9 +63,6 @@ if __name__ == "__main__":
     import os
 
     port = 8085
-
-    # Open a web browser pointing at the app.
-    os.system("open http://localhost:{0}".format(port))
 
     # Set up the development server on port 8000.
     app.debug = True
