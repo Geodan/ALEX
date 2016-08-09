@@ -150,9 +150,17 @@ class ProcessManager(object):
             poly = poly[0]
             geo_objects.append(geojson.Feature(geometry=geojson.loads(poly)))
 
+        crs = {
+            "type": "name",
+            "properties": {
+                "name": "EPSG:" + str(context["crs"])
+            }
+        }
+        collection = geojson.FeatureCollection(geo_objects, crs=crs)
+
         return {
             'type': 'result',
-            'result': geojson.dumps(geojson.FeatureCollection(geo_objects))
+            'result': geojson.dumps(collection)
         }
 
     def __init__(self,
@@ -197,6 +205,7 @@ class ProcessManager(object):
             raise ValueError("Sentence is not a string")
 
         context = {}
+        context["crs"] = 3857
 
         if location:
             context["location"] = location
