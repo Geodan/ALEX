@@ -1,4 +1,4 @@
-# GeodataNLUI
+# ALEX - A Linguistic EXchange geobot
 
 This repository is a set of services and bots that allows users to query geographical data using natural language.
 
