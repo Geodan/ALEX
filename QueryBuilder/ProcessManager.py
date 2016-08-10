@@ -213,7 +213,12 @@ class ProcessManager(object):
         """
 
         # TODO make this more robust
-
+        if len(databindings[0]) == 0:
+            return {
+                'type': 'error',
+                'error_code': 1,
+                'error_message': 'No subsets found'
+            }
         sql = ""
         for subset in databindings[0]:
             if not subset.relative:
@@ -428,11 +433,31 @@ class ProcessManager(object):
 
         sql = self.fn_to_sql(logical_sentence["result"], context)
 
-        print(sql)
+        if sql["type"] == "error":
+            logging.error(sql["error_message"])
+            return sql  # Error to client
+
+        if "result" not in sql:
+            logging.error("No field result in sql result?")
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'No result in result'
+            }
 
         geojson = self.fn_get_geojson(sql["result"], context)
 
-        # TODO Check geojson result
+        if geojson["type"] == "error":
+            logging.error(sql["error_message"])
+            return sql  # Error to client
+
+        if "result" not in geojson:
+            logging.error("No field result in geojson result?")
+            return {
+                'type': 'error',
+                'error_code': 5,
+                'error_message': 'No result in result'
+            }
 
         return {
             'type': 'result',
