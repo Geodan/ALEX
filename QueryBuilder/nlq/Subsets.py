@@ -1,21 +1,38 @@
-import random, string
+import random
+import string
 
-def randomword(length):
-   return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
+
+def randomword(leng):
+    """
+    Generates a random of word of <leng> alphanumberical characters
+
+    :param leng: The length of the string
+    :type datasets: int
+    :returns: A random alphanumerical string of length <leng>
+    """
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(leng))
+
 
 class Subset:
-
+    """A subset of a dataset"""
     def __init__(self):
         self.id = randomword(5)
         self.relative = False
         self.relative_to = None
 
-class RadiusSubset(Subset):
 
+class RadiusSubset(Subset):
+    """A subset of a dataset, containing objects in a radius of a point"""
     def __init__(self,
-                    extraction,
-                    context
-                ):
+                 extraction,
+                 context
+                 ):
+        """
+        :param extraction: The arguments, extracted from the sentence
+        :param context: Known context about the request
+        :type extraction: dict
+        :type context: dict
+        """
         super().__init__()
         self.search_query = extraction["sq"]
         self.distance = extraction["distance"]
@@ -24,25 +41,27 @@ class RadiusSubset(Subset):
         else:
             self.location = context["location"]
 
-
-    def is_valid(self):
-        return self.search_query and self.distance and self.location
-
     def __str__(self):
-        return "RadiusSubset: %s within %s from %s" % (self.search_query, self.distance, self.location)
+        return "RadiusSubset: %s within %s from %s" % (
+            self.search_query, self.distance, self.location
+        )
 
 
-class GeomSubset(Subset):
-
+class PolygonSubset(Subset):
+    """
+    A subset of a dataset, containing objects within a polygon, such
+    as a city
+    """
     def __init__(self,
-                search_query=None,
-                geom=None,
-                dataset=None
-                ):
-        self.search_query = search_query
-        self.geom = geom
-        self.dataset = dataset
-
-
-    def is_valid(self):
-        return self.search_query and self.geom and self.dataset
+                 extraction,
+                 context
+                 ):
+        """
+        :param extraction: The arguments, extracted from the sentence
+        :param context: Known context about the request
+        :type extraction: dict
+        :type context: dict
+        """
+        super().__init__()
+        self.search_query = extraction["sq"]
+        self.polygon_name = extraction["polygon_name"].text

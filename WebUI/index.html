@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>A Linguistic EXchange geobot demo</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" />
+        <link rel="stylesheet" href="http://openlayers.org/en/v3.17.1/css/ol.css" type="text/css">
+        <link rel="stylesheet" href="css/main.css" />
+        <script src="http://openlayers.org/en/v3.17.1/build/ol.js" type="text/javascript"></script>
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+        <script src="js/ui.js"></script>
+    </head>
+    <body>
+        <div id="information">
+            <h1>ALEX - A Linguistic EXchange geobot</h1>
+            <div id="text">
+                ALEX is a natural language interface for geographical data, such as openstreetmap data. It performs
+                natural language processing to analyze the intent of the user, after which it generates SQL queries and responds with
+                the corresponding GeoJSON, which is displayed on the screen. Keep in mind that it is still
+                in very early development.
+                <br>
+                ALEX is fully opensource and available on github.
+
+            </div>
+        </div>
+        <div id="demo">
+            <div id="openlayers-map"></div>
+            <div id="input">
+                <input type="text" id="nlp_input" placeholder="E.g. give me houses in Amsterdam"><br>
+                <button type="button" id="parse" >Parse & run</button>
+            </div>
+            <div id="hint">
+                Try some of these!<br>
+                Give me hospitals in Amsterdam<br>
+                Return schools in Den Haag<br>
+                Give me houses in a radius of 5km<br>
+            </div>
+        </div>
+        <a class="github-fork-ribbon right-bottom fixed"
+            href="https://github.com/flammified/GeodataNLUI"
+            title="Fork me on GitHub">Fork me on GitHub</a>
+    </body>
+</html>

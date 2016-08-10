@@ -5,33 +5,38 @@ from nltk.corpus import stopwords
 english_stopwords = set(stopwords.words('english'))
 wnl = WordNetLemmatizer()
 
-# WITH buf AS (
-#     SELECT ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(4.9127781,52.3426354), 4326), 3857), 5000) geom
-# )
-# SELECT name FROM planet_osm_polygon, buf
-# WHERE way IS NOT NULL AND
-#     NOT ST_IsEmpty(way) AND
-#     ST_Intersects(way, buf.geom);
 
 class Type:
     Location, Distance, Amount, SearchQuery = range(4)
-#
+
+
 class Argument(WordGroup):
+    """A group of words that serves as an argument to a different word"""
 
     def __init__(self, word, type):
+        """
+        Returns the corresponding amount of meters
+
+        :returns: The amount of meters
+        :rtype: int
+        """
         super().__init__(word)
         self.type = type
 
+
 class Location(Argument):
+    """A group of words that is a location argument"""
 
     def __init__(self, word):
         super().__init__(word, Type.Location)
+        self.text = " ".join(self.words)
 
     def __str__(self):
         return "Location: " + " ".join(self.words)
 
 
 class Distance(Argument):
+    """A group of words that represents a distance as an argument"""
 
     def __init__(self, word, unit):
         super().__init__(word, Type.Distance)
@@ -39,6 +44,12 @@ class Distance(Argument):
         self.unit = unit
 
     def get_meters(self):
+        """
+        Returns the corresponding amount of meters
+
+        :returns: The amount of meters
+        :rtype: int
+        """
         if self.unit == "kilometre":
             return self.value * 1000
         elif self.unit == "mile":
@@ -47,16 +58,20 @@ class Distance(Argument):
         return self.value
 
     def __str__(self):
-        return "Distance: " + " ".join(self.words) + " " + self.unit + " or " + str(self.get_meters()) + " metres"
+        res = "Distance: " + " ".join(self.words)
+        res = res + " " + self.unit + " or " + str(self.get_meters())
+        res = res + " metres"
+        return res
 
 
 class Amount(Argument):
-
+    """A group of words that represents an amount as an argument"""
     def __init__(self, word):
         super().__init__(word, Type.Amount)
 
-class SearchQuery(Argument):
 
+class SearchQuery(Argument):
+    """A group of words that represents a search query as an argument"""
     def __init__(self, word):
         super().__init__(word, Type.SearchQuery)
         words = []
@@ -64,14 +79,6 @@ class SearchQuery(Argument):
             words.append(wnl.lemmatize(word, 'n'))
 
         self.search = " ".join(words)
-
-    def get_database(self):
-        if self.search == "road":
-            database = "planet_osm_lines"
-        else:
-            database = "planet_osm_polygon"
-
-        return database
 
     def __str__(self):
         return "SearchQuery: " + self.search

@@ -1,0 +1,37 @@
+#demo {
+    width: 95%;
+    padding: 1em;
+    margin: 0 auto;
+}
+
+#hint {
+    font-size: 14px;
+    text-align: center;
+}
+
+#openlayers-map {
+    height: 60%;
+    width: 100%;
+}
+#input {
+    text-align:center;
+    width: 50%;
+    margin: 3em auto 1em;
+}
+
+#information, h2 {
+    text-align:center;
+}
+
+#information, #text {
+    margin: 0 auto;
+    width: 80%;
+}
+
+#nlp_input {
+    width: 100%;
+}
+
+#information {
+    width: 100%;
+}
