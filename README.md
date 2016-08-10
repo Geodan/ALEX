@@ -11,6 +11,15 @@ At the moment the package consists of:
 
 At the moment, all of our code is written in Python. We plan of releasing the structure of the messages between components, so new appliances can be written in multiple languages.
 
+## Some words of warning
+
+This project is very much in alpha state. While it is in a working condition at the moment, it is subject to big changes while in development. It is also still very buggy and the codebase needs to be restructured down the road.
+
+## But with this in mind
+
+We would really appreciate any attention to this project! If you have any suggestions, ideas or help you can give, feel free to do so!
+
+
 # Installation
 
 ### Python Requirements
@@ -44,3 +53,7 @@ If you don't want to host it yourself: click on [this link](https://telegram.me/
 ### QGIS plugin
 
 To install the QGIS plugin, you (obviously) have to have QGIS installed. If that is the case, copy the QGISPlugin/GeodataNLUI to ~/.qgis2/python/plugins (if you are using linux). If you are using windows, you will have to find that out yourself for now :)
+
+## WebUI
+
+Just host the files on a webserver and make sure the ip address in ui.js is correct!
