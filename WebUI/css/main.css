@@ -4,6 +4,11 @@
     margin: 0 auto;
 }
 
+#hint {
+    font-size: 14px;
+    text-align: center;
+}
+
 #openlayers-map {
     height: 60%;
     width: 100%;
@@ -11,7 +16,7 @@
 #input {
     text-align:center;
     width: 50%;
-    margin: 3em auto 3em;
+    margin: 3em auto 1em;
 }
 
 #information, h2 {
