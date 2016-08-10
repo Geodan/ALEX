@@ -37,6 +37,9 @@ class Sentence:
         sentence = WordGroup(copy.copy(self.original))
 
         top_confidence = 0
+        if len(self.nlp_result["entities"]) == 0:
+            return
+            
         for c in self.nlp_result["entities"]["command"]:
             if c["confidence"] > top_confidence:
                 top_confidence = c["confidence"]
