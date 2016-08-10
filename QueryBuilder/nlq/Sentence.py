@@ -12,15 +12,27 @@ from .Exceptions import MalformedSentenceException
 class Sentence:
 
     def __init__(self, sentence, nlp_result):
+        """
+        :param sentence: The sentence to parse
+        :param nlp_result: The wit.ai response
+        :type sentence: string
+        :type nlp_result: list
+        """
 
-        # default argument scope can be annoying
         self.nlp_result = nlp_result
         self.original = sentence
         self._construct_parts_from_nlp()
         self.arguments = self.get_argument_stack()
 
     def _construct_parts_from_nlp(self):
+        """
+        Constructs the nlp parts from the internal wit.ai result
 
+        Constructs the nlp parts from the internal wit.ai result and
+        stores them inside self.ordered_sentence
+
+        :returns: None
+        """
         ordered_sentence = []
         sentence = WordGroup(copy.copy(self.original))
 
@@ -109,6 +121,12 @@ class Sentence:
         self.nlp_parts = nlp_parts
 
     def get_argument_stack(self):
+        """
+        Returns the arguments in the order in the sentence
+
+        :returns: A chronological list of the arguments in the sentence
+        :rtype: list
+        """
         result = []
         for part in self.nlp_parts:
             if issubclass(type(part), Arguments.Argument):
@@ -116,4 +134,11 @@ class Sentence:
         return result
 
     def add_part(self, part):
+        """
+        Generates a random of word of <leng> alphanumberical characters
+
+        :param part: The part to add
+        :type part: WordGroup
+        :returns: None
+        """
         self.nlp_parts.append(part)

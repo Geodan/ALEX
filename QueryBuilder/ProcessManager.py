@@ -10,18 +10,22 @@ from wit import Wit
 
 # Needed for the wit.ai client for now :c
 def say(session_id, context, msg):
-    print(msg)
+    """
+        Say function needed by the wit.ai client.
+    """
+    pass
 
 
 def merge(session_id, context, entities, msg):
-    print("Session id", session_id)
-    print("Context", context)
-    print("entities", entities)
-    print("msg",  msg)
+    """
+        Merge function needed by the wit.ai client.
+    """
 
 
 def error(session_id, context, e):
-    print(str(e))
+    """
+        Error function needed by the wit.ai client.
+    """
 
 actions = {
     'say': say,
@@ -35,9 +39,29 @@ client = Wit(config.wit_token, actions)
 class ProcessManager(object):
 
     def classify(self, sentence, context):
+        """Classifies the words in the word type classes of the nlq package.
+
+        :param sentence: The sentence as a string
+        :param context: The current information known about the request
+        :type sentence: str
+        :type context: dict
+        :returns: A dict containing the result type and the corresponding
+            fields. The object has the following structure:
+            JSON object as a string with the following structure:
+            Successful: {
+                type: "result",
+                result: [language_objects]
+            }
+            Error: {
+                type: "error",
+                error_code: int
+                error_message: string containing the error message
+            }
+        :rtype: dict
+        """
+
         try:
             resp = client.converse('geobot-session-5', sentence, {})
-            print(resp)
         except:
             return {
                 'type': 'error',
@@ -63,15 +87,62 @@ class ProcessManager(object):
         return {'type': 'result', 'result': sentence_object.nlp_parts}
 
     def identify_datasets(self, language_objects, context):
+        """Identifies the datasets in the classified sentence.
 
-        datasets, new_sentence = self.extractor.extract_all_templates(
+        This is the default dataset identification algorithm. It finds
+        datasets like RadiusSubsets in the wordtypes using templates.
+
+        :param language_objects: The nlq language objects
+        :param context: The current information known about the request
+        :type sentence: list
+        :type context: dict
+        :returns: A dict containing the result type and the corresponding
+            fields. The object has the following structure:
+            JSON object as a string with the following structure:
+            Successful: {
+                type: "result",
+                result: [language_objects]
+            }
+            Error: {
+                type: "error",
+                error_code: int
+                error_message: string containing the error message
+            }
+        :rtype: dict
+        """
+
+        datasets, new_sen = self.extractor.extract_all_templates(
             language_objects, context
         )
         context["datasets"] = datasets
-        return {'type': 'result', 'result': (new_sentence, datasets)}
+        return {'type': 'result', 'result': (new_sen, context["datasets"])}
 
-    # TODO better name for semi query
     def logical_bindings(self, semi_query, datasets, context):
+        """Finds the bindings between datasets and fills
+        in the neccessary information in the binding classes.
+
+        :param semi_query: The nlq language objects, with the found datasets
+        :param datasets: The found datasets in an list
+        :param context: The current information known about the request
+        :type sentence: list
+        :type datasets: list
+        :type context: dict
+        :returns: A dict containing the result type and the corresponding
+            fields. The object has the following structure:
+            JSON object as a string with the following structure:
+            Successful: {
+                type: "result",
+                result: ([datasets], [bindings])}
+            }
+            Error: {
+                type: "error",
+                error_code: int
+                error_message: string containing the error message
+            }
+        :rtype: dict
+        """
+
+        # TODO Apply filters as well (and change name accordingly)
 
         bindings = []
         for index, query_object in enumerate(semi_query):
@@ -120,9 +191,28 @@ class ProcessManager(object):
         return {'type': 'result', 'result': (datasets, bindings)}
 
     def to_sql(self, databindings, context):
+        """Converts the bindings and the subsets to SQL
 
-        # Only test SQLization. The real parts are going to be put
-        # in the SQLQuery.py file
+        :param databindings: The subsets and the bindings between them
+        :param context: The current information known about the request
+        :type databindings: tuple
+        :type context: dict
+        :returns: A dict containing the result type and the corresponding
+            fields. The object has the following structure:
+            JSON object as a string with the following structure:
+            Successful: {
+                type: "result",
+                result: string containing the SQL
+            }
+            Error: {
+                type: "error",
+                error_code: int
+                error_message: string containing the error message
+            }
+        :rtype: dict
+        """
+
+        # TODO make this more robust
 
         sql = ""
         for subset in databindings[0]:
@@ -143,6 +233,26 @@ class ProcessManager(object):
         return {'type': 'result', 'result': sql}
 
     def get_geojson(self, sql, context):
+        """Runs the SQL and dumps it to a GeoJSON string.
+
+        :param sql: The sql query
+        :param context: The current information known about the request
+        :type databindings: string
+        :type context: dict
+        :returns: A dict containing the result type and the corresponding
+            fields. The object has the following structure:
+            JSON object as a string with the following structure:
+            Successful: {
+                type: "result",
+                result: string containing the GeoJSON results
+            }
+            Error: {
+                type: "error",
+                error_code: int
+                error_message: string containing the error message
+            }
+        :rtype: dict
+        """
         result = self.db.query(sql).getresult()
         geo_objects = []
 
@@ -172,7 +282,20 @@ class ProcessManager(object):
                  sqlf=None,
                  geojf=None
                  ):
-
+        """
+        :param databases: The dataset objects to search through
+        :param cf: A function that replaces the classification step
+        :param dsf: A function that replaces the dataset identification step
+        :param lbf: A function that replaces the logical binding step
+        :param sqlf: A function that replaces the sqlization step
+        :param sgeojfqlf: A function that replaces the geojson conversion step
+        :type databases: list
+        :type cf: callable
+        :type dsf: callable
+        :type lbf: callable
+        :type sqlf: callable
+        :type sgeojfqlf: callable
+        """
         self.databases = databases
         self.db = db
         if not cf:
@@ -201,6 +324,28 @@ class ProcessManager(object):
         )
 
     def handle_request(self, sentence, location=None):
+        """Performs the whole multi-step algorithm on one sentence and
+            one location
+
+        :param sentence: The sentence to parse
+        :param location: A list containing [lon, lat, espgnumber]
+        :type sentence: string
+        :type datasets: list
+        :returns: A dict containing the result type and the corresponding
+            fields. The object has the following structure:
+            JSON object as a string with the following structure:
+            Successful: {
+                type: "result",
+                result: GeoJSON as string
+            }
+            Error: {
+                type: "error",
+                error_code: int
+                error_message: string containing the error message
+            }
+        :rtype: dict
+        """
+
         if type(sentence) != str:
             raise ValueError("Sentence is not a string")
 
@@ -237,7 +382,7 @@ class ProcessManager(object):
         print(language_objects)
         lang_obj_result = language_objects["result"]
         semi_query = self.fn_identify_dataset(lang_obj_result, context)
-
+        print(semi_query)
         if "type" not in semi_query:
             logging.error("No type field in dataset result")
             return {

@@ -6,42 +6,39 @@ import random
 import string
 
 
-def randomword(leng):
-    return ''.join(random.choice(string.ascii_lowercase) for i in range(leng))
-
-
 class Filter(WordGroup):
+    """A group of words that filters a dataset"""
 
-    """
-    For now an empty class that serves as a type indentifier
-    """
-
-    def __init__(self, words, args, optional_args):
+    def __init__(self, words):
+        """
+        :param words: The words
+        :type string
+        """
         super().__init__(words)
-        self.arguments = args
-        self.optional_arguments = optional_args
 
 
 class RadiusFilter(Filter):
-
+    """A group of words that filters a dataset in a radius from a location"""
     def __init__(self, words):
-        super().__init__(words, [Arguments.Distance], [Arguments.Location])
+        """
+        :param words: The words
+        :type string
+        """
+        super().__init__(words)
 
     def __str__(self):
         return "RadiusFilter: " + " ".join(self.words)
 
-    def get_dataset(self, context, sq, args, opt_args):
-        if len(opt_args) == 0:
-            opt_args.append(context["location"])
-
-        return Subsets.RadiusSubset(sq, args[0], opt_args[0])
-
 
 # TODO Fix this in the classification stage, this is no filter
 class ReferenceFilter(Filter):
-
+    """A group of words that moves the referencelocation to a location"""
     def __init__(self, words):
-        super().__init__(words, [], [])
+        """
+        :param words: The words
+        :type string
+        """
+        super().__init__(words)
 
     def __str__(self):
         return "ReferenceFilter: " + " ".join(self.words)

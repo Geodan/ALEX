@@ -1,7 +1,16 @@
 class SQLQuery(object):
 
-    # All lists of arguments
     def __init__(self, alias=None, attributes=None, tables=None, clauses=None):
+        """
+        :param alias: The alias of the selection
+        :param attributes: The table attributes to select (e.g. %s.way)
+        :param tables: The table names
+        :param clauses: The where clauses
+        :type alias: string
+        :type attributes: list of strings
+        :type tables: list of strings
+        :type clauses: list of strings
+        """
 
         if not attributes:
             attributes = []
@@ -16,6 +25,17 @@ class SQLQuery(object):
         self.clauses = clauses
 
     def to_string(self, information, with_with=True):
+        """
+        Returns the SQL query as a string
+
+        :param information: The information to fill in the SQL
+        :param with_with: Should it include the WITH header
+        :type alias: dict
+        :type attributes: boolean
+
+        :returns: the SQL query
+        :rtype: string
+        """
 
         if self.alias:
             if with_with:

@@ -3,8 +3,10 @@ from .WordGroup import WordGroup
 
 
 class Command(WordGroup):
-    """
-    For now an empty class that serves as a type identifier
-    """
+    """A group of words that tells what to do with the data"""
     def __init__(self, words):
+        """
+        :param words: The words
+        :type string
+        """
         super().__init__(words)

@@ -18,7 +18,6 @@ process_manager = ProcessManager.ProcessManager([osm_buildings], db)
 def index():
     """
     When you request the root path, you'll get the index.html template.
-
     """
     return flask.render_template("index.html")
 
@@ -27,15 +26,24 @@ def index():
 @crossorigin.crossdomain(origin="*", headers="Content-Type")
 def query():
     """
-    Parses the given sentence and returns the corresponding geodata
+    Parses the given sentence and returns the corresponding geodata.
+    Takes a JSON object with the required key 'sentence', containing the
+    sentence and an optional 'location', containing an array with
+    [lon, lat, espgnumber].
 
-    :returns data:
-        A JSON array containing the geodata when successful. An empty array
-        when not successful.
+    :returns: JSON object as a string with the following structure:
+        Successful: {
+            type: "result",
+            result: <geojson>
+        }
+        Error: {
+            type: "error",
+            error_code: int
+            error_message: string containing the error message
+        }
     """
 
     if flask.request.method == 'POST':
-        print("yo")
         json_data = flask.request.get_json(force=True)
 
         if "sentence" not in json_data:

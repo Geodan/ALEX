@@ -11,13 +11,13 @@ class ConnectionTypes(Enum):
 
 
 class DatasetCombiner(object):
-
+    """Unused class atm"""
     def __init__(self, datasets):
         pass
 
 
 def StatisticalModel(object):
-
+    """Unused class atm"""
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -25,6 +25,17 @@ def StatisticalModel(object):
 class GeoDataset(object):
 
     def __init__(self, db_name, content, table, columns=None):
+        """
+        :param db_name: The name of the dataset
+        :param content: A summary of the content (e.g. 'polygons' or 'houses')
+        :param table: The table name
+        :param columns: A list of the usable columns in the dataset.
+            Defaults to all columns in the table
+        :type db_name: string
+        :type content: string
+        :type table: string
+        :type columns: list
+        """
         self.db_name = db_name.lower()
         self.content = content
         self.table = table
@@ -36,6 +47,12 @@ class GeoDataset(object):
             self.columns = columns
 
     def get_subset(self, subset):
+        """
+        Returns the PostGIS sql for a given subset
+
+        :returns: The SQL for the PostGIS server
+        :rtype: string
+        """
         subset_type = type(subset)
         sql = ""
         if subset.relative:
@@ -72,20 +89,39 @@ class GeoDataset(object):
         subset_sql.clauses.append("{selection} IS NOT NULL AND ")
         subset_sql.clauses.append("NOT ST_isEmpty({selection}) AND ")
         subset_sql.clauses.append("ST_Intersects({selection},{container}.way)")
-
+        subset_sql.clauses.append(" AND (")
         for i, tag in enumerate(tags):
             inf["tag" + str(i)] = str(tag[0])
             inf["keyword" + str(i)] = str(tag[1])
-            subset_sql.clauses.append(" AND {tag%d}='{keyword%d}'" % (i, i))
+            subset_sql.clauses.append("{tag%d}='{keyword%d}'" % (i, i))
+
+            if i != (len(tags) - 1):
+                subset_sql.clauses.append(" OR ")
+        subset_sql.clauses.append(")")
 
         sql += subset_sql.to_string(inf, with_with=False)
 
         return sql
 
     def map_keyword_to_tags(self, word):
+        """
+        Returns the tables and the searchterms for a given word
+
+        Returns the tables and the searchterms for a given word.
+        E.g. when searching for a road, look for "highway": "pedestrian"
+
+        :returns: A list of tuples, containing the tablename and the keyword
+        :rtype: tuple
+        """
         raise NotImplementedError
 
     def get_geometry_table(self):
+        """
+        Returns the name of geometry columns for the dataset
+
+        :returns: The name of the geometry column
+        :rtype: string
+        """
         raise NotImplementedError
 
 
@@ -95,6 +131,12 @@ class OSMTable(GeoDataset):
         super().__init__("OSM", content, table, columns)
 
     def get_geometry_table(self):
+        """
+        Returns the name of geometry columns for the dataset
+
+        :returns: The name of the geometry column
+        :rtype: string
+        """
         return "way"
 
 
@@ -115,7 +157,16 @@ class OSMPolygonTable(OSMTable):
         )
 
     def map_keyword_to_tags(self, word):
-        return [("building", word)]
+        """
+        Returns the tables and the searchterms for a given word
+
+        Returns the tables and the searchterms for a given word.
+        E.g. when searching for a road, look for "highway": "pedestrian"
+
+        :returns: A list of tuples, containing the tablename and the keyword
+        :rtype: tuple
+        """
+        return [("building", word), ("amenity", word)]
 
 
 class OSMLinesTable(OSMTable):
@@ -135,6 +186,15 @@ class OSMLinesTable(OSMTable):
         )
 
     def map_keyword_to_tags(self, word):
+        """
+        Returns the tables and the searchterms for a given word
+
+        Returns the tables and the searchterms for a given word.
+        E.g. when searching for a road, look for "highway": "pedestrian"
+
+        :returns: A list of tuples, containing the tablename and the keyword
+        :rtype: tuple
+        """
         if word in ["road"]:
             return [("highway", "*")]
         if word in ["train_rail", "train_line", "trainrail", "trainline"]:

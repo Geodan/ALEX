@@ -4,6 +4,19 @@ class BasicSQLGenerator(object):
 
     @classmethod
     def radius_from_point_sql(cls, name, location, distance):
+        """
+        Returns the SQL query for a radius selection from a point
+
+        :param name: The name of the selection
+        :param location: The location, containing [lon, lat, epsgnumber]
+        :param distance: The distance object
+        :type name: string
+        :type location: list
+        :type distance: Arguments.Distance
+
+        :returns: the SQL query object
+        :rtype: string
+        """
         inf = {
             'lon': location[0],
             'lat': location[1],
@@ -20,6 +33,17 @@ class BasicSQLGenerator(object):
 
     @classmethod
     def polygon_from_location_sql(cls, sql_name, location_name):
+        """
+        Returns the SQL query for a polygon selection of a city
+
+        :param sql_name: The name of the selection
+        :param location_name: The name of the polygon
+        :type name: string
+        :type location: string
+
+        :returns: the SQL query object
+        :rtype: string
+        """
         inf = {
             'name': location_name,
         }
