@@ -70,6 +70,12 @@ class ProcessManager(object):
             }
         original_sentence = sentence.lower().strip()
         sentence_object = Sentence(original_sentence, resp)
+        if len(sentence_object.nlp_parts) == 0:
+            return {
+                'type': 'error',
+                'error_code': 1,
+                'error_message': 'No sentence'
+            }
 
         # Best place to find the command and store it in the context
         for index, lang_object in enumerate(sentence_object.nlp_parts):
