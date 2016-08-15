@@ -35,3 +35,10 @@
 #information {
     width: 100%;
 }
+
+.example {
+    text-decoration: underline;
+    color: #B30700;
+    cursor: pointer;
+    cursor: hand;
+}

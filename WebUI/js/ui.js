@@ -1,24 +1,10 @@
 $(function() {
 
-    // var featureSource = new ol.source.Vector({});
-    // var coordFeature = new ol.Feature({
-    //     id: 'cur_coord',
-    //     geometry: new ol.geom.Point(ol.proj.transform([5.399167, 52.150836], 'EPSG:4326', 'EPSG:3857')),
-    //     popuptext: 'Your current position'
-    // });
-    // var iconStyle = new ol.style.Style({
-    //     image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-    //         opacity: 1,
-    //         rotation: 0 * Math.PI / 180,
-    //         scale: [0.5, 0.5],
-    //         src: '/imgs/icon.png'
-    //     }))
-    // });
-    //
-    // coordFeature.setStyle(iconStyle);
-    //
-    // coordFeature.setId('cur_coord');
-    // featureSource.addFeature(coordFeature);
+    //Set test of nlp_unput if an example is clicked
+    $(".example").click(function(e){
+        $("#nlp_input").val($(this).text());
+    });
+
 
     var map = new ol.Map({
         target: 'openlayers-map',
