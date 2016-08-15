@@ -1,4 +1,4 @@
-
+import config
 import flask
 import ProcessManager
 import crossorigin
@@ -7,7 +7,7 @@ from pg import DB
 
 app = flask.Flask(__name__)
 
-db = DB(dbname='gis', host='localhost', port=5432)
+db = DB(dbname=config.db_name, host=config.db_host_name, port=config.db_port)
 # nit__(self, content, table):
 osm_buildings = Datasets.OSMPolygonTable()
 # osm_roads = Datasets.OSMLinesTable()
@@ -70,8 +70,8 @@ def query():
 if __name__ == "__main__":
     import os
 
-    port = 8085
+    port = config.dev_server_port
 
     # Set up the development server on port 8000.
-    app.debug = True
+    app.debug = False
     app.run('0.0.0.0', port=port)

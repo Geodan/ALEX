@@ -415,7 +415,11 @@ class ProcessManager(object):
             }
 
         sq_result = semi_query["result"]
-        logical_sentence = self.fn_logical_bindings(*sq_result, context)
+        logical_sentence = self.fn_logical_bindings(
+            sq_result[0],
+            sq_result[1],
+            context
+        )
         print(logical_sentence)
         if "type" not in logical_sentence:
             logging.error("No type field in dataset result")
