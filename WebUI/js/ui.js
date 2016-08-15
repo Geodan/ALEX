@@ -5,6 +5,14 @@ $(function() {
         $("#nlp_input").val($(this).text());
     });
 
+    $('#nlp_input').keypress(function (e) {
+        var key = e.which;
+        if(key == 13) { // the enter key code
+            $('#parse').click();
+            return false;
+        }
+    });
+
 
     var map = new ol.Map({
         target: 'openlayers-map',
