@@ -79,7 +79,7 @@ $(function() {
                 $("#parse").prop("disabled",false);
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                window.alert(errorThrown)
+                window.alert("Error occured: " + errorThrown)
                 $("#parse").prop("disabled",false);
             }
         });
