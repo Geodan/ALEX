@@ -4,8 +4,8 @@ This repository is a set of services and bots that allows users to query geograp
 
 At the moment the package consists of:
 
-    - A telegram bot as an (very simple) I/O mechanism
-    - A query builder, which builds the queries from a sentence, runs it on a postgis server and then returns corresponding geojson
+    - A telegram bot as a (very simple) I/O mechanism
+    - A query builder, which builds the queries from a sentence, runs it on a PostGIS server and then returns corresponding geojson
     - An QGIS plugin, which allows users to send queries and see the results
     in a vector layer.
 
@@ -31,7 +31,7 @@ Some of our components require a PostGIS installation with the OSM (open street 
 
 ### QueryBuilder
 
-The default port for a PostgreSQL server is 8085. If you change the port, you have to change it in the querybuilder as well. At the moment there is no config file yet, but the port can be changed in the QueryBuilder.py file.
+The default port for a PostgreSQL server is 8085. If you change the port, you have to edit this in the configuration file as well. You can find this configuration file under ```QueryBuilder/config.py```. This file also contains other configuration options.
 
 To build a query, we first have to classify the intents of the words we were given. We use a service called [wit.ai](wit.ai) for this. We trained our bot with a few intents.
 
@@ -41,6 +41,8 @@ To build a query, we first have to classify the intents of the words we were giv
     - arguments, such as distance and locations, which filters use to fill in blanks
 
 To use our bot, yours has to be trained like ours. Information on this will be added later. For now you can experiment by adding your wit.ai token in ```QueryBuilder/config.py```
+
+You also need to download the ```wordnet``` and the ```stopwords``` corpora using the nltk downloader. To access the nltk downloader, first import nltk in the python interpreter and then run ```nltk.download()```
 
 ### Telegram bot
 
