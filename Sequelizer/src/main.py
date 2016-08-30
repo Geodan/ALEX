@@ -7,7 +7,13 @@ from pg import DB
 
 app = flask.Flask(__name__)
 
-db = DB(dbname=config.db_name, host=config.db_host_name, port=config.db_port)
+db = DB(
+    dbname=config.db_name,
+    host=config.db_host_name,
+    port=config.db_port,
+    user=config.user,
+    passwd=config.password
+)
 # nit__(self, content, table):
 osm_buildings = Datasets.OSMPolygonTable()
 # osm_roads = Datasets.OSMLinesTable()
