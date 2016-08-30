@@ -1,4 +1,4 @@
-# Geobot-Telegram
+# ALEX-Telegram
 
 This package contains a telegram bot that listens for /query commands and sends them to a query builder server. We host one instance, which can be found [here](telegram.me/geo_query_bot).
 
