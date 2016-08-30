@@ -4,7 +4,7 @@ import geojson
 
 from nlq import Arguments, Commands, Filters, Logic, Subsets
 from nlq.temply.extractors import WordTypeTemplateExtractor
-from nlq.Sentence import Sentence
+from nlq.WitAISentence import WitAISentence
 from wit import Wit
 
 
@@ -69,7 +69,7 @@ class ProcessManager(object):
                 'error_message': 'Wit returned an error'
             }
         original_sentence = sentence.lower().strip()
-        sentence_object = Sentence(original_sentence, resp)
+        sentence_object = WitAISentence(original_sentence, resp)
         if len(sentence_object.nlp_parts) == 0:
             return {
                 'type': 'error',
@@ -361,7 +361,7 @@ class ProcessManager(object):
             raise ValueError("Sentence is not a string")
 
         context = {}
-        context["crs"] = 3857
+        context["crs"] = 4326
 
         if location:
             context["location"] = location

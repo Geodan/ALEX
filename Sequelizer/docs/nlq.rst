@@ -59,7 +59,7 @@ nlq.Logic module
     :undoc-members:
     :show-inheritance:
 
-nlq.Sentence module
+nlq.WitAISentence module
 -------------------
 
 .. automodule:: nlq.Sentence
