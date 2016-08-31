@@ -17,7 +17,7 @@ db = DB(
 # nit__(self, content, table):
 osm_buildings = Datasets.OSMPolygonTable(3857)
 # osm_roads = Datasets.OSMLinesTable()
-process_manager = ProcessManager.ProcessManager([osm_buildings], db, 4326)
+process_manager = ProcessManager.ProcessManager([osm_buildings], db, config.projection)
 
 
 @app.route("/")
