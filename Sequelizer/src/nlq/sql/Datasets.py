@@ -1,3 +1,5 @@
+import csv
+
 from enum import Enum
 from .SQLQuery import SQLQuery
 from .utils import BasicSQLGenerator
@@ -162,6 +164,15 @@ class OSMPolygonTable(OSMTable):
             ]
         )
 
+        self.key_value = {}
+        with open('data/dictionary.csv') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row["word"] not in self.key_value:
+                    self.key_value[row["word"]] = []
+                self.key_value[row["word"]].append((row["tag"], row["key"]))
+        print(self.key_value)
+
     def map_keyword_to_tags(self, word):
         """
         Returns the tables and the searchterms for a given word
@@ -172,6 +183,9 @@ class OSMPolygonTable(OSMTable):
         :returns: A list of tuples, containing the tablename and the keyword
         :rtype: tuple
         """
+        if word in self.key_value:
+            print(self.key_value[word])
+            return self.key_value[word]
         return [("building", word), ("amenity", word)]
 
 
