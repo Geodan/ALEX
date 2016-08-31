@@ -1,9 +1,10 @@
 from .SQLQuery import SQLQuery
 
+
 class BasicSQLGenerator(object):
 
     @classmethod
-    def radius_from_point_sql(cls, name, location, distance):
+    def radius_from_point_sql(cls, name, location, distance, projection):
         """
         Returns the SQL query for a radius selection from a point
 
@@ -21,11 +22,12 @@ class BasicSQLGenerator(object):
             'lon': location[0],
             'lat': location[1],
             'proj': location[2],
+            'to_proj': projection,
             'dist': distance.get_meters()
         }
         geom = SQLQuery(alias=name)
         geom.attributes.append(
-            "ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint({lon}, {lat}), {proj}), 3857), {dist}) way"
+            "ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint({lon}, {lat}), {proj}), {to_proj}), {dist}) way"
         )
 
         sql = geom.to_string(inf)

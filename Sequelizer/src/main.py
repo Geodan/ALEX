@@ -15,9 +15,9 @@ db = DB(
     passwd=config.password
 )
 # nit__(self, content, table):
-osm_buildings = Datasets.OSMPolygonTable()
+osm_buildings = Datasets.OSMPolygonTable(3857)
 # osm_roads = Datasets.OSMLinesTable()
-process_manager = ProcessManager.ProcessManager([osm_buildings], db)
+process_manager = ProcessManager.ProcessManager([osm_buildings], db, config.projection)
 
 
 @app.route("/")

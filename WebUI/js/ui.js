@@ -39,12 +39,12 @@ $(function() {
 
         });
 
-    //proj4.defs('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs');
-    // proj4.defs('EPSG:3857', '+proj=merc +ellps=WGS84 +datum=WGS84 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs');
     $("#parse").click( function() {
         $("#parse").prop("disabled",true);
+
         loc = map.getView().getCenter().map(String);
         loc.push("3857");
+
         data = {
             'sentence': $('#nlp_input').val(),
             'location': loc
@@ -54,25 +54,26 @@ $(function() {
 
         $.ajax({
             type:"POST",
-            url:"http://192.168.24.148:8085/parse_and_run_query",
+            url:"http://127.0.0.1:8085/parse_and_run_query",
             data: data,
             contentType: "application/json",
 
             success: function (result) {
-                console.log(result)
+
                 if (result["type"] == "error") {
                     $("#parse").prop("disabled",false);
                     window.alert(result["error_message"])
                     return
                 }
+
                 geojson = JSON.parse(result["result"])
 
-                var features = new ol.format.GeoJSON().readFeatures(geojson);
+                var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: "EPSG:3857" });
                 var vectorSource = new ol.source.Vector({
-                  features: features
+                    features: features
                 });
                 var vectorLayer = new ol.layer.Vector({
-                    source: vectorSource
+                    source: vectorSource,
                 });
                 map.addLayer(vectorLayer)
 
