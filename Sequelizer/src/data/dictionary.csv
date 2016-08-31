@@ -1,0 +1,944 @@
+word,tag,key
+airport,aeroway,aerodrome
+airports,aeroway,aerodrome
+animal boarding facility,amenity,animal_boarding
+animal boarding facilities,amenity,animal_boarding
+animal shelter,amenity,animal_shelter
+animal shelters,amenity,animal_shelter
+arts centre,amenity,arts_centre
+arts centres,amenity,arts_centre
+arts center,amenity,arts_centre
+arts centers,amenity,arts_centre
+atm,amenity,atm
+atms,amenity,atm
+cash,amenity,atm
+cash,amenity,atm
+cash machine,amenity,atm
+cash machines,amenity,atm
+auditorium,amenity,auditorium
+auditoriums,amenity,auditorium
+bank,amenity,bank
+banks,amenity,bank
+bar,amenity,bar
+bars,amenity,bar
+bar,amenity,pub
+bars,amenity,pub
+bench,amenity,bench
+benches,amenity,bench
+cycle parking,amenity,bicycle_parking
+cycle parkings,amenity,bicycle_parking
+cycle rental,amenity,bicycle_rental
+cycle rentals,amenity,bicycle_rental
+bicycle parking,amenity,bicycle_parking
+bicycle parkings,amenity,bicycle_parking
+bicycle rental,amenity,bicycle_rental
+bicycle rentals,amenity,bicycle_rental
+brothel,amenity,brothel
+brothels,amenity,brothel
+bureau de change,amenity,bureau_de_change
+bureau de changes,amenity,bureau_de_change
+bureaus de change,amenity,bureau_de_change
+bus station,amenity,bus_station
+bus stations,amenity,bus_station
+cafe,amenity,cafe
+cafes,amenity,cafe
+car rental,amenity,car_rental
+car rentals,amenity,car_rental
+car share,amenity,car_sharing
+car sharing,amenity,car_sharing
+car sharings,amenity,car_sharing
+car wash,amenity,car_wash
+car washes,amenity,car_wash
+casino,amenity,casino
+casinos,amenity,casino
+cinema,amenity,cinema
+cinemas,amenity,cinema
+clinic,amenity,clinic
+clinics,amenity,clinic
+club,amenity,club
+clubs,amenity,club
+college,amenity,college
+colleges,amenity,college
+community centre,amenity,community_centre
+community centres,amenity,community_centre
+community center,amenity,community_centre
+community centers,amenity,community_centre
+courthouse,amenity,courthouse
+courthouses,amenity,courthouse
+crematorium,amenity,crematorium
+crematoriums,amenity,crematorium
+dentist,amenity,dentist
+dentists,amenity,dentist
+doctor,amenity,doctors
+doctors,amenity,doctors
+martial arts,amenity,dojo
+martial arts,amenity,dojo
+dojo,amenity,dojo
+dojos,amenity,dojo
+dojang,amenity,dojo
+dojang,amenity,dojo
+dormitory,amenity,dormitory
+dormitorys,amenity,dormitory
+dormitories,amenity,dormitory
+drinking water,amenity,drinking_water
+water,amenity,drinking_water
+driving school,amenity,driving_school
+driving schools,amenity,driving_school
+embassy,amenity,embassy
+embassys,amenity,embassy
+embassies,amenity,embassy
+emergency phone,amenity,emergency_phone
+emergency phones,amenity,emergency_phone
+fast food,amenity,fast_food
+food,amenity,restaurant
+food,amenity,fast_food
+food,amenity,restaurant
+food,amenity,fast_food
+ferry terminal,amenity,ferry_terminal
+ferry terminals,amenity,ferry_terminal
+fire hydrant,amenity,fire_hydrant
+fire hydrants,amenity,fire_hydrant
+fire station,amenity,fire_station
+fire stations,amenity,fire_station
+fountain,amenity,fountain
+fountains,amenity,fountain
+fuel,amenity,fuel
+fuels,amenity,fuel
+fuel station,amenity,fuel
+fuel stations,amenity,fuel
+gas,amenity,fuel
+gas,amenity,fuel
+gas station,amenity,fuel
+gas stations,amenity,fuel
+petrol,amenity,fuel
+petrol station,amenity,fuel
+petrol stations,amenity,fuel
+grave yard,amenity,grave_yard
+grave yards,amenity,grave_yard
+fitness centre,amenity,gym
+fitness centres,amenity,gym
+fitness center,amenity,gym
+fitness centers,amenity,gym
+gym,amenity,gym
+gyms,amenity,gym
+hall,amenity,hall
+halls,amenity,hall
+health centre,amenity,health_centre
+health centres,amenity,health_centre
+health center,amenity,health_centre
+health centers,amenity,health_centre
+hospital,amenity,hospital
+hospitals,amenity,hospital
+hotel,amenity,hotel
+hotels,amenity,hotel
+hunting stand,amenity,hunting_stand
+hunting stands,amenity,hunting_stand
+ice cream,amenity,ice_cream
+kindergarten,amenity,kindergarten
+kindergartens,amenity,kindergarten
+library,amenity,library
+librarys,amenity,library
+libraries,amenity,library
+market,amenity,market
+markets,amenity,market
+marketplace,amenity,marketplace
+marketplaces,amenity,marketplace
+mountain rescue,amenity,mountain_rescue
+mountain rescues,amenity,mountain_rescue
+night club,amenity,nightclub
+night clubs,amenity,nightclub
+nursery,amenity,nursery
+nurserys,amenity,nursery
+nurseries,amenity,nursery
+nursing home,amenity,nursing_home
+nursing homes,amenity,nursing_home
+office,amenity,office
+offices,amenity,office
+park,amenity,park
+parks,amenity,park
+parking,amenity,parking
+pharmacy,amenity,pharmacy
+pharmacys,amenity,pharmacy
+pharmacies,amenity,pharmacy
+church,amenity,place_of_worship
+churches,amenity,place_of_worship
+place of worship,amenity,place_of_worship
+place of worships,amenity,place_of_worship
+places of worship,amenity,place_of_worship
+police,amenity,police
+post box,amenity,post_box
+post boxes,amenity,post_box
+post office,amenity,post_office
+post offices,amenity,post_office
+pre-school,amenity,preschool
+pre-schools,amenity,preschool
+prison,amenity,prison
+prisons,amenity,prison
+pub,amenity,bar
+pubs,amenity,bar
+pub,amenity,pub
+pubs,amenity,pub
+public building,amenity,public_building
+public buildings,amenity,public_building
+public market,amenity,public_market
+public markets,amenity,public_market
+reception area,amenity,reception_area
+reception areas,amenity,reception_area
+recycling point,amenity,recycling
+recycling points,amenity,recycling
+restaurant,amenity,restaurant
+restaurants,amenity,restaurant
+retirement home,amenity,retirement_home
+retirement homes,amenity,retirement_home
+sauna,amenity,sauna
+saunas,amenity,sauna
+school,amenity,school
+schools,amenity,school
+shelter,amenity,shelter
+shelters,amenity,shelter
+shop,amenity,shop
+shops,amenity,shop
+shopping,amenity,shopping
+social club,amenity,social_club
+social clubs,amenity,social_club
+studio,amenity,studio
+studios,amenity,studio
+supermarket,amenity,supermarket
+supermarkets,amenity,supermarket
+swinger club,amenity,swingerclub
+swinger clubs,amenity,swingerclub
+taxi,amenity,taxi
+taxis,amenity,taxi
+taxi rank,amenity,taxi
+taxi ranks,amenity,taxi
+telephone,amenity,telephone
+telephones,amenity,telephone
+public telephone,amenity,telephone
+public telephones,amenity,telephone
+phone booth,amenity,telephone
+phone booths,amenity,telephone
+theatre,amenity,theatre
+theatres,amenity,theatre
+toilet,amenity,toilets
+toilets,amenity,toilets
+town hall,amenity,townhall
+town halls,amenity,townhall
+university,amenity,university
+universitys,amenity,university
+universities,amenity,university
+vending machine,amenity,vending_machine
+vending machines,amenity,vending_machine
+veterinary surgery,amenity,veterinary
+veterinary surgeries,amenity,veterinary
+village hall,amenity,village_hall
+village halls,amenity,village_hall
+waste basket,amenity,waste_basket
+waste baskets,amenity,waste_basket
+rubbish bin,amenity,waste_basket
+rubbish bins,amenity,waste_basket
+bin,amenity,waste_basket
+bins,amenity,waste_basket
+wifi access,amenity,wifi
+wifi,amenity,wifi
+wifi point,amenity,wifi
+wifi points,amenity,wifi
+youth centre,amenity,youth_centre
+youth centres,amenity,youth_centre
+youth center,amenity,youth_centre
+youth centers,amenity,youth_centre
+apartment block,building,apartments
+apartment blocks,building,apartments
+building block,building,block
+building blocks,building,block
+bunker,building,bunker
+bunkers,building,bunker
+chapel,building,chapel
+chapels,building,chapel
+church,building,church
+churchs,building,church
+churches,building,church
+city hall,building,city_hall
+city halls,building,city_hall
+commercial building,building,commercial
+commercial buildings,building,commercial
+dormitory,building,dormitory
+dormitorys,building,dormitory
+building entrance,building,entrance
+building entrances,building,entrance
+faculty building,building,faculty
+faculty buildings,building,faculty
+farm building,building,farm
+farm buildings,building,farm
+flats,building,flats
+flats,building,flats
+garage,building,garage
+garages,building,garage
+hall,building,hall
+halls,building,hall
+hospital building,building,hospital
+hospital buildings,building,hospital
+hotel,building,hotel
+hotels,building,hotel
+house,building,house
+houses,building,house
+industrial building,building,industrial
+industrial buildings,building,industrial
+office building,building,office
+office buildings,building,office
+public building,building,public
+public buildings,building,public
+residential building,building,residential
+residential buildings,building,residential
+retail building,building,retail
+retail buildings,building,retail
+school building,building,school
+school buildings,building,school
+shop,building,shop
+shops,building,shop
+stadium,building,stadium
+stadiums,building,stadium
+store,building,store
+stores,building,store
+terrace,building,terrace
+terraces,building,terrace
+tower,building,tower
+towers,building,tower
+railway station,building,train_station
+railway stations,building,train_station
+station,building,train_station
+stations,building,train_station
+university building,building,university
+university buildings,building,university
+building,building,yes
+buildings,building,yes
+bridleway,highway,bridleway
+bridleways,highway,bridleway
+guided bus lane,highway,bus_guideway
+guided bus lanes,highway,bus_guideway
+bus stop,highway,bus_stop
+bus stops,highway,bus_stop
+byway,highway,byway
+byways,highway,byway
+highway under construction,highway,construction
+highways under construction,highway,construction
+cycle path,highway,cycleway
+cycle paths,highway,cycleway
+distance marker,highway,distance_marker
+distance markers,highway,distance_marker
+emergency access point,highway,emergency_access_point
+emergency access points,highway,emergency_access_point
+footpath,highway,footway
+footpaths,highway,footway
+ford,highway,ford
+fords,highway,ford
+gate,highway,gate
+gates,highway,gate
+living street,highway,living_street
+living streets,highway,living_street
+minor road,highway,minor
+minor roads,highway,minor
+motorway,highway,motorway
+motorways,highway,motorway
+motorway junction,highway,motorway_junction
+motorway junctions,highway,motorway_junction
+motorway road,highway,motorway_link
+motorway roads,highway,motorway_link
+path,highway,path
+paths,highway,path
+pedestrian way,highway,pedestrian
+pedestrian ways,highway,pedestrian
+platform,highway,platform
+platforms,highway,platform
+primary road,highway,primary
+primary roads,highway,primary
+primary road,highway,primary_link
+primary roads,highway,primary_link
+raceway,highway,raceway
+raceways,highway,raceway
+residential,highway,residential
+residentials,highway,residential
+residential road,highway,residential
+residential roads,highway,residential
+rest area,highway,rest_area
+rest stop,highway,rest_area
+road,highway,road
+roads,highway,road
+secondary road,highway,secondary
+secondary roads,highway,secondary
+secondary road,highway,secondary_link
+secondary roads,highway,secondary_link
+service road,highway,service
+service roads,highway,service
+service area,highway,services
+motorway services,highway,services
+motorway services,highway,services
+steps,highway,steps
+steps,highway,steps
+stile,highway,stile
+stiles,highway,stile
+tertiary road,highway,tertiary
+tertiary roads,highway,tertiary
+track,highway,track
+tracks,highway,track
+trail,highway,trail
+trails,highway,trail
+trunk road,highway,trunk
+trunk roads,highway,trunk
+trunk road,highway,trunk_link
+trunk roads,highway,trunk_link
+unclassified road,highway,unclassified
+unclassified roads,highway,unclassified
+unsurfaced road,highway,unsurfaced
+unsurfaced roads,highway,unsurfaced
+archaeological site,historic,archaeological_site
+archaeological sites,historic,archaeological_site
+battlefield,historic,battlefield
+battlefields,historic,battlefield
+boundary stone,historic,boundary_stone
+boundary stones,historic,boundary_stone
+building,historic,building
+buildings,historic,building
+castle,historic,castle
+castles,historic,castle
+church,historic,church
+churchs,historic,church
+churches,historic,church
+house,historic,house
+houses,historic,house
+icon,historic,icon
+icons,historic,icon
+manor,historic,manor
+manors,historic,manor
+memorial,historic,memorial
+memorials,historic,memorial
+mine,historic,mine
+mines,historic,mine
+monument,historic,monument
+monuments,historic,monument
+museum,historic,museum
+museums,historic,museum
+ruin,historic,ruins
+ruins,historic,ruins
+tower,historic,tower
+towers,historic,tower
+wayside cross,historic,wayside_cross
+wayside crosses,historic,wayside_cross
+wayside shrine,historic,wayside_shrine
+wayside shrines,historic,wayside_shrine
+wreck,historic,wreck
+wrecks,historic,wreck
+allotment,landuse,allotments
+allotments,landuse,allotments
+basin,landuse,basin
+basins,landuse,basin
+brownfield land,landuse,brownfield
+brownfield lands,landuse,brownfield
+cemetery,landuse,cemetery
+cemeterys,landuse,cemetery
+cemeteries,landuse,cemetery
+commercial area,landuse,commercial
+commercial areas,landuse,commercial
+conservation,landuse,conservation
+conservations,landuse,conservation
+construction,landuse,construction
+constructions,landuse,construction
+farm,landuse,farm
+farms,landuse,farm
+farmland,landuse,farmland
+farmlands,landuse,farmland
+farmyard,landuse,farmyard
+farmyards,landuse,farmyard
+forest,landuse,forest
+forests,landuse,forest
+grass,landuse,grass
+grasses,landuse,grass
+greenfield land,landuse,greenfield
+greenfield lands,landuse,greenfield
+industrial area,landuse,industrial
+industrial areas,landuse,industrial
+landfill,landuse,landfill
+landfills,landuse,landfill
+meadow,landuse,meadow
+meadows,landuse,meadow
+military area,landuse,military
+military areas,landuse,military
+mine,landuse,mine
+mines,landuse,mine
+mountain,landuse,mountain
+mountains,landuse,mountain
+nature reserve,landuse,nature_reserve
+nature reserves,landuse,nature_reserve
+park,landuse,park
+parks,landuse,park
+piste,landuse,piste
+pistes,landuse,piste
+plaza,landuse,plaza
+plazas,landuse,plaza
+quarry,landuse,quarry
+quarrys,landuse,quarry
+quarries,landuse,quarry
+railway,landuse,railway
+railways,landuse,railway
+recreation ground,landuse,recreation_ground
+recreation grounds,landuse,recreation_ground
+reservoir,landuse,reservoir
+reservoirs,landuse,reservoir
+residential area,landuse,residential
+residential areas,landuse,residential
+retail,landuse,retail
+retails,landuse,retail
+village green,landuse,village_green
+village greens,landuse,village_green
+vineyard,landuse,vineyard
+vineyards,landuse,vineyard
+wetland,landuse,wetland
+wetlands,landuse,wetland
+wood,landuse,wood
+woods,landuse,wood
+beach resort,leisure,beach_resort
+beach resorts,leisure,beach_resort
+common land,leisure,common
+common lands,leisure,common
+fishing area,leisure,fishing
+fishing areas,leisure,fishing
+garden,leisure,garden
+gardens,leisure,garden
+golf course,leisure,golf_course
+golf courses,leisure,golf_course
+hackerspace,leisure,hackerspace
+hackerspaces,leisure,hackerspace
+ice rink,leisure,ice_rink
+ice rinks,leisure,ice_rink
+marina,leisure,marina
+marinas,leisure,marina
+miniature golf,leisure,miniature_golf
+miniature golfs,leisure,miniature_golf
+nature reserve,leisure,nature_reserve
+nature reserves,leisure,nature_reserve
+park,leisure,park
+parks,leisure,park
+sports pitch,leisure,pitch
+sports pitches,leisure,pitch
+playground,leisure,playground
+playgrounds,leisure,playground
+recreation ground,leisure,recreation_ground
+recreation grounds,leisure,recreation_ground
+slipway,leisure,slipway
+slipways,leisure,slipway
+sports centre,leisure,sports_centre
+sports centres,leisure,sports_centre
+sports centre,leisure,sports_centre
+sports centers,leisure,sports_centre
+stadium,leisure,stadium
+stadiums,leisure,stadium
+swimming pool,leisure,swimming_pool
+swimming pools,leisure,swimming_pool
+running track,leisure,track
+running tracks,leisure,track
+water park,leisure,water_park
+water parks,leisure,water_park
+bay,natural,bay
+bays,natural,bay
+beach,natural,beach
+beachs,natural,beach
+beaches,natural,beach
+cape,natural,cape
+capes,natural,cape
+cave entrance,natural,cave_entrance
+cave entrances,natural,cave_entrance
+channel,natural,channel
+channels,natural,channel
+cliff,natural,cliff
+cliffs,natural,cliff
+coastline,natural,coastline
+coastlines,natural,coastline
+crater,natural,crater
+craters,natural,crater
+feature,natural,feature
+features,natural,feature
+fell,natural,fell
+fells,natural,fell
+fjord,natural,fjord
+fjords,natural,fjord
+geyser,natural,geyser
+geysers,natural,geyser
+glacier,natural,glacier
+glaciers,natural,glacier
+heath,natural,heath
+heaths,natural,heath
+hill,natural,hill
+hills,natural,hill
+island,natural,island
+islands,natural,island
+land,natural,land
+lands,natural,land
+marsh,natural,marsh
+marshs,natural,marsh
+marshes,natural,marsh
+moor,natural,moor
+moors,natural,moor
+mud,natural,mud
+muds,natural,mud
+peak,natural,peak
+peaks,natural,peak
+point,natural,point
+points,natural,point
+reef,natural,reef
+reefs,natural,reef
+ridge,natural,ridge
+ridges,natural,ridge
+river,natural,river
+rivers,natural,river
+rock,natural,rock
+rocks,natural,rock
+scree,natural,scree
+screes,natural,scree
+scrub,natural,scrub
+scrubs,natural,scrub
+shoal,natural,shoal
+shoals,natural,shoal
+spring,natural,spring
+springs,natural,spring
+strait,natural,strait
+straits,natural,strait
+tree,natural,tree
+trees,natural,tree
+valley,natural,valley
+valleys,natural,valley
+volcano,natural,volcano
+volcanos,natural,volcano
+water,natural,water
+waters,natural,water
+wetland,natural,wetland
+wetlands,natural,wetland
+wetlands,natural,wetlands
+wetlands,natural,wetlands
+wood,natural,wood
+woods,natural,wood
+city,place,city
+citys,place,city
+cities,place,city
+country,place,country
+countrys,place,country
+countries,place,country
+county,place,county
+countys,place,county
+counties,place,county
+farm,place,farm
+farms,place,farm
+hamlet,place,hamlet
+hamlets,place,hamlet
+house,place,house
+houses,place,house
+houses,place,houses
+houses,place,houses
+island,place,island
+islands,place,island
+islet,place,islet
+islets,place,islet
+locality,place,locality
+localitys,place,locality
+localities,place,locality
+moor,place,moor
+moors,place,moor
+municipality,place,municipality
+municipalitys,place,municipality
+municipalities,place,municipality
+postcode,place,postcode
+postcodes,place,postcode
+region,place,region
+regions,place,region
+sea,place,sea
+seas,place,sea
+state,place,state
+states,place,state
+subdivision,place,subdivision
+subdivisions,place,subdivision
+suburb,place,suburb
+suburbs,place,suburb
+town,place,town
+towns,place,town
+unincorporated area,place,unincorporated_area
+unincorporated areas,place,unincorporated_area
+village,place,village
+villages,place,village
+abandoned railway,railway,abandoned
+abandoned railways,railway,abandoned
+railway under construction,railway,construction
+railway under constructions,railway,construction
+disused railway,railway,disused
+disused railways,railway,disused
+disused railway station,railway,disused_station
+disused railway stations,railway,disused_station
+funicular railway,railway,funicular
+funicular railways,railway,funicular
+train stop,railway,halt
+train stops,railway,halt
+historic railway station,railway,historic_station
+historic railway stations,railway,historic_station
+railway junction,railway,junction
+railway junctions,railway,junction
+level crossing,railway,level_crossing
+level crossings,railway,level_crossing
+light rail,railway,light_rail
+light rails,railway,light_rail
+monorail,railway,monorail
+monorails,railway,monorail
+narrow gauge railway,railway,narrow_gauge
+narrow gauge railways,railway,narrow_gauge
+railway platform,railway,platform
+railway platforms,railway,platform
+preserved railway,railway,preserved
+preserved railways,railway,preserved
+railway spur,railway,spur
+railway spurs,railway,spur
+railway station,railway,station
+railway stations,railway,station
+station,railway,station
+stations,railway,station
+subway station,railway,subway
+subway stations,railway,subway
+subway entrance,railway,subway_entrance
+subway entrances,railway,subway_entrance
+railway points,railway,switch
+railway points,railway,switch
+tramway,railway,tram
+tramways,railway,tram
+tram stop,railway,tram_stop
+tram stops,railway,tram_stop
+railway yard,railway,yard
+railway yards,railway,yard
+off license,shop,alcohol
+off licenses,shop,alcohol
+apparel shop,shop,apparel
+apparel shops,shop,apparel
+art shop,shop,art
+art shops,shop,art
+bakery,shop,bakery
+bakerys,shop,bakery
+bakeries,shop,bakery
+beauty shop,shop,beauty
+beauty shops,shop,beauty
+beverages shop,shop,beverages
+beverages shops,shop,beverages
+bicycle shop,shop,bicycle
+bicycle shops,shop,bicycle
+book shop,shop,books
+book shops,shop,books
+butcher,shop,butcher
+butchers,shop,butcher
+car shop,shop,car
+car shops,shop,car
+car dealer,shop,car_dealer
+car dealers,shop,car_dealer
+car parts,shop,car_parts
+car parts,shop,car_parts
+carpet shop,shop,carpet
+carpet shops,shop,carpet
+car repair,shop,car_repair
+car repairs,shop,car_repair
+charity shop,shop,charity
+charity shops,shop,charity
+chemist,shop,chemist
+chemists,shop,chemist
+clothes shop,shop,clothes
+clothes shops,shop,clothes
+computer shop,shop,computer
+computer shops,shop,computer
+confectionery shop,shop,confectionery
+confectionery shops,shop,confectionery
+convenience store,shop,convenience
+convenience stores,shop,convenience
+copy shop,shop,copyshop
+copy shops,shop,copyshop
+cosmetics shop,shop,cosmetics
+cosmetics shops,shop,cosmetics
+department store,shop,department_store
+department stores,shop,department_store
+discount items shop,shop,discount
+discount items shops,shop,discount
+do-it-yourself,shop,doityourself
+do-it-yourselfs,shop,doityourself
+do-it-yourselves,shop,doityourself
+drugstore,shop,drugstore
+drugstores,shop,drugstore
+dry cleaning,shop,dry_cleaning
+dry cleanings,shop,dry_cleaning
+electronics shop,shop,electronics
+electronics shops,shop,electronics
+estate agent,shop,estate_agent
+estate agents,shop,estate_agent
+farm shop,shop,farm
+farm shops,shop,farm
+fashion shop,shop,fashion
+fashion shops,shop,fashion
+fish shop,shop,fish
+fish shops,shop,fish
+florist,shop,florist
+florists,shop,florist
+food shop,shop,food
+food shops,shop,food
+funeral director,shop,funeral_directors
+funeral directors,shop,funeral_directors
+furniture,shop,furniture
+furnitures,shop,furniture
+gallery,shop,gallery
+gallerys,shop,gallery
+galleries,shop,gallery
+garden centre,shop,garden_centre
+garden centres,shop,garden_centre
+garden center,shop,garden_centre
+garden centers,shop,garden_centre
+general store,shop,general
+general stores,shop,general
+gift shop,shop,gift
+gift shops,shop,gift
+greengrocer,shop,greengrocer
+greengrocers,shop,greengrocer
+grocery shop,shop,grocery
+grocery shops,shop,grocery
+hairdresser,shop,hairdresser
+hairdressers,shop,hairdresser
+hardware store,shop,hardware
+hardware stores,shop,hardware
+hi-fi,shop,hifi
+hi-fis,shop,hifi
+insurance,shop,insurance
+insurances,shop,insurance
+jewelry shop,shop,jewelry
+jewelry shops,shop,jewelry
+kiosk shop,shop,kiosk
+kiosk shops,shop,kiosk
+laundry,shop,laundry
+laundrys,shop,laundry
+laundries,shop,laundry
+mall,shop,mall
+malls,shop,mall
+market,shop,market
+markets,shop,market
+mobile phone shop,shop,mobile_phone
+mobile phone shops,shop,mobile_phone
+motorcycle shop,shop,motorcycle
+motorcycle shops,shop,motorcycle
+music shop,shop,music
+music shops,shop,music
+newsagent,shop,newsagent
+newsagents,shop,newsagent
+optician,shop,optician
+opticians,shop,optician
+organic food shop,shop,organic
+organic food shops,shop,organic
+outdoor shop,shop,outdoor
+outdoor shops,shop,outdoor
+pet shop,shop,pet
+pet shops,shop,pet
+photo shop,shop,photo
+photo shops,shop,photo
+salon,shop,salon
+salons,shop,salon
+shoe shop,shop,shoes
+shoe shops,shop,shoes
+shopping centre,shop,shopping_centre
+shopping centres,shop,shopping_centre
+shopping center,shop,shopping_centre
+shopping centers,shop,shopping_centre
+sports shop,shop,sports
+sports shops,shop,sports
+stationery shop,shop,stationery
+stationery shops,shop,stationery
+supermarket,shop,supermarket
+supermarkets,shop,supermarket
+toy shop,shop,toys
+toy shops,shop,toys
+travel agency,shop,travel_agency
+travel agencys,shop,travel_agency
+travel agencies,shop,travel_agency
+video shop,shop,video
+video shops,shop,video
+off license,shop,wine
+off licenses,shop,wine
+alpine hut,tourism,alpine_hut
+alpine huts,tourism,alpine_hut
+artwork,tourism,artwork
+artworks,tourism,artwork
+attraction,tourism,attraction
+attractions,tourism,attraction
+bed and breakfast,tourism,bed_and_breakfast
+bed and breakfasts,tourism,bed_and_breakfast
+cabin,tourism,cabin
+cabins,tourism,cabin
+camp site,tourism,camp_site
+camp sites,tourism,camp_site
+caravan site,tourism,caravan_site
+caravan sites,tourism,caravan_site
+chalet,tourism,chalet
+chalets,tourism,chalet
+guest house,tourism,guest_house
+guest houses,tourism,guest_house
+hostel,tourism,hostel
+hostels,tourism,hostel
+hotel,tourism,hotel
+hotels,tourism,hotel
+information,tourism,information
+informations,tourism,information
+lean to,tourism,lean_to
+lean tos,tourism,lean_to
+motel,tourism,motel
+motels,tourism,motel
+museum,tourism,museum
+museums,tourism,museum
+picnic site,tourism,picnic_site
+picnic sites,tourism,picnic_site
+theme park,tourism,theme_park
+theme parks,tourism,theme_park
+valley,tourism,valley
+valleys,tourism,valley
+viewpoint,tourism,viewpoint
+viewpoints,tourism,viewpoint
+zoo,tourism,zoo
+zoos,tourism,zoo
+boatyard,waterway,boatyard
+boatyards,waterway,boatyard
+boat ramp,leisure,slipway
+boat ramps,leisure,slipway
+canal,waterway,canal
+canals,waterway,canal
+waterway connector,waterway,connector
+waterway connectors,waterway,connector
+dam,waterway,dam
+dams,waterway,dam
+derelict canal,waterway,derelict_canal
+derelict canals,waterway,derelict_canal
+ditch,waterway,ditch
+ditchs,waterway,ditch
+ditches,waterway,ditch
+dock,waterway,dock
+docks,waterway,dock
+drain,waterway,drain
+drains,waterway,drain
+lock,waterway,lock
+locks,waterway,lock
+lock gate,waterway,lock_gate
+lock gates,waterway,lock_gate
+mineral spring,waterway,mineral_spring
+mineral springs,waterway,mineral_spring
+mooring,waterway,mooring
+moorings,waterway,mooring
+rapids,waterway,rapids
+rapids,waterway,rapids
+river,waterway,river
+rivers,waterway,river
+riverbank,waterway,riverbank
+riverbanks,waterway,riverbank
+stream,waterway,stream
+streams,waterway,stream
+wadi,waterway,wadi
+wadis,waterway,wadi
+waterfall,waterway,waterfall
+waterfalls,waterway,waterfall
+water point,waterway,water_point
+water points,waterway,water_point
+weir,waterway,weir
+weirs,waterway,weir
+windmill,man_made,windmill
+windmills,man_made,windmill
