@@ -24,21 +24,24 @@ def StatisticalModel(object):
 
 class GeoDataset(object):
 
-    def __init__(self, db_name, content, table, columns=None):
+    def __init__(self, db_name, content, table, proj, columns=None):
         """
         :param db_name: The name of the dataset
         :param content: A summary of the content (e.g. 'polygons' or 'houses')
         :param table: The table name
         :param columns: A list of the usable columns in the dataset.
             Defaults to all columns in the table
+        :param proj The projection of the geographical data as an EPSG number
         :type db_name: string
         :type content: string
         :type table: string
         :type columns: list
         """
+
         self.db_name = db_name.lower()
         self.content = content
         self.table = table
+        self.epsg = proj
 
         if not columns:
             # TODO Get the columns
@@ -53,6 +56,7 @@ class GeoDataset(object):
         :returns: The SQL for the PostGIS server
         :rtype: string
         """
+
         subset_type = type(subset)
         sql = ""
         if subset.relative:
@@ -63,7 +67,8 @@ class GeoDataset(object):
             sql = BasicSQLGenerator.radius_from_point_sql(
                 subset.id + "_container",
                 subset.location,
-                subset.distance
+                subset.distance,
+                self.epsg
             )
             sql += ', '
 
@@ -127,8 +132,8 @@ class GeoDataset(object):
 
 class OSMTable(GeoDataset):
 
-    def __init__(self, content, table, columns):
-        super().__init__("OSM", content, table, columns)
+    def __init__(self, content, table, proj, columns):
+        super().__init__("OSM", content, table, proj, columns)
 
     def get_geometry_table(self):
         """
@@ -142,10 +147,11 @@ class OSMTable(GeoDataset):
 
 class OSMPolygonTable(OSMTable):
 
-    def __init__(self):
+    def __init__(self, proj):
         super().__init__(
             "polygons",
             "planet_osm_polygon",
+            proj,
             [
                 "building",
                 "amenity",
@@ -171,10 +177,11 @@ class OSMPolygonTable(OSMTable):
 
 class OSMLinesTable(OSMTable):
 
-    def __init__(self):
+    def __init__(self, proj):
         super().__init__(
             "lines",
             "planet_osm_line",
+            proj,
             [
                 "railway",
                 "amenity",
