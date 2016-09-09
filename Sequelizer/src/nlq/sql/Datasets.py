@@ -171,7 +171,6 @@ class OSMPolygonTable(OSMTable):
                 if row["word"] not in self.key_value:
                     self.key_value[row["word"]] = []
                 self.key_value[row["word"]].append((row["tag"], row["key"]))
-        print(self.key_value)
 
     def map_keyword_to_tags(self, word):
         """
@@ -181,7 +180,7 @@ class OSMPolygonTable(OSMTable):
         E.g. when searching for a road, look for "highway": "pedestrian"
 
         :returns: A list of tuples, containing the tablename and the keyword
-        :rtype: tuple
+        :rtype: list
         """
         if word in self.key_value:
             print(self.key_value[word])
