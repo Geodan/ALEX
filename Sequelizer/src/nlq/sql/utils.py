@@ -56,7 +56,7 @@ class BasicSQLGenerator(object):
         poly.clauses.append("NOT ST_IsEmpty(way) AND ")
         poly.clauses.append("admin_level='10'AND ")
         poly.clauses.append("LOWER(name) LIKE '{name}'")
-        poly.clauses.append("LIMIT 1")
+        # poly.clauses.append("LIMIT 1")
 
         sql = poly.to_string(inf)
         return sql
