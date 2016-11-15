@@ -1,13 +1,13 @@
-# This file contains metadata for your plugin. Since 
-# version 2.0 of QGIS this is the proper way to supply 
-# information about a plugin. The old method of 
-# embedding metadata in __init__.py will 
+# This file contains metadata for your plugin. Since
+# version 2.0 of QGIS this is the proper way to supply
+# information about a plugin. The old method of
+# embedding metadata in __init__.py will
 # is no longer supported since version 2.0.
 
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=GeodataNLUI
+name=ALEX
 qgisMinimumVersion=2.0
 description=This plugin provides a GUI for our NLUI
 version=0.1
@@ -16,8 +16,8 @@ email=alexander.freeman@geodan.nl
 
 about=This plugin provides a GUI for the Natural Language User Interface we build to query geographical data. This data will then be put in the current open map.
 
-tracker=https://github.com/flammified/GeodataNLUI
-repository=https://github.com/flammified/GeodataNLUI
+tracker=https://github.com/geodan/ALEX
+repository=https://github.com/geodan/ALEX
 # End of mandatory metadata
 
 # Recommended items:
@@ -36,4 +36,3 @@ experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-

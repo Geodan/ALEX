@@ -2,16 +2,34 @@ import config
 import flask
 import ProcessManager
 import crossorigin
+import sqlite3
+import json
+
 from nlq.sql import Datasets
 from pg import DB
 
 app = flask.Flask(__name__)
 
-db = DB(dbname=config.db_name, host=config.db_host_name, port=config.db_port)
+db = DB(
+    dbname=config.db_name,
+    host=config.db_host_name,
+    port=config.db_port,
+    user=config.user,
+    passwd=config.password
+)
 # nit__(self, content, table):
-osm_buildings = Datasets.OSMPolygonTable()
+osm_buildings = Datasets.OSMPolygonTable(3857)
 # osm_roads = Datasets.OSMLinesTable()
-process_manager = ProcessManager.ProcessManager([osm_buildings], db)
+process_manager = ProcessManager.ProcessManager([osm_buildings], db, config.projection)
+
+debug_db = sqlite3.connect('log.db')
+cursor = debug_db.cursor()
+
+cursor.execute("""CREATE TABLE IF NOT EXISTS log (
+                    id INTEGER PRIMARY KEY,
+                    sentence TEXT,
+                    geojson_output TEXT
+                );""")
 
 
 @app.route("/")
@@ -58,6 +76,10 @@ def query():
             loc = json_data["location"]
 
         result = process_manager.handle_request(json_data["sentence"], loc)
+
+        log = (json_data["sentence"], json.dumps(result))
+        cursor.execute("INSERT INTO log (sentence, geojson_output) VALUES (?, ?)", log)
+        debug_db.commit()
 
         flask_response = result
 

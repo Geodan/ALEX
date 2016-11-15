@@ -4,7 +4,7 @@ import geojson
 
 from nlq import Arguments, Commands, Filters, Logic, Subsets
 from nlq.temply.extractors import WordTypeTemplateExtractor
-from nlq.Sentence import Sentence
+from nlq.WitAISentence import WitAISentence
 from wit import Wit
 
 
@@ -20,12 +20,14 @@ def merge(session_id, context, entities, msg):
     """
         Merge function needed by the wit.ai client.
     """
+    pass
 
 
 def error(session_id, context, e):
     """
         Error function needed by the wit.ai client.
     """
+    pass
 
 actions = {
     'say': say,
@@ -69,7 +71,7 @@ class ProcessManager(object):
                 'error_message': 'Wit returned an error'
             }
         original_sentence = sentence.lower().strip()
-        sentence_object = Sentence(original_sentence, resp)
+        sentence_object = WitAISentence(original_sentence, resp)
         if len(sentence_object.nlp_parts) == 0:
             return {
                 'type': 'error',
@@ -231,8 +233,9 @@ class ProcessManager(object):
                 sql += self.databases[0].get_subset(subset)
 
         sql += "SELECT "
+        crs = context["crs"]
         for subset in databindings[0]:
-            sql += "ST_AsGeoJSON(%s.way)" % (subset.id)
+            sql += "ST_AsGeoJSON(ST_Transform(%s.way, %s))" % (subset.id, crs)
 
         sql += " FROM "
 
@@ -287,6 +290,7 @@ class ProcessManager(object):
     def __init__(self,
                  databases,
                  db,
+                 projection,
                  cf=None,
                  dsf=None,
                  lbf=None,
@@ -295,12 +299,16 @@ class ProcessManager(object):
                  ):
         """
         :param databases: The dataset objects to search through
+        :param db The database connection
+        :param projection The projection of all output as an EPSG number
         :param cf: A function that replaces the classification step
         :param dsf: A function that replaces the dataset identification step
         :param lbf: A function that replaces the logical binding step
         :param sqlf: A function that replaces the sqlization step
         :param sgeojfqlf: A function that replaces the geojson conversion step
         :type databases: list
+        :type db A Pygresql database instance
+        :type projection int
         :type cf: callable
         :type dsf: callable
         :type lbf: callable
@@ -309,6 +317,7 @@ class ProcessManager(object):
         """
         self.databases = databases
         self.db = db
+        self.projection = projection
         if not cf:
             self.fn_classify = self.classify
         if not dsf:
@@ -339,7 +348,7 @@ class ProcessManager(object):
             one location
 
         :param sentence: The sentence to parse
-        :param location: A list containing [lon, lat, espgnumber]
+        :param location: A list containing [lon, lat, epsgnumber]
         :type sentence: string
         :type datasets: list
         :returns: A dict containing the result type and the corresponding
@@ -361,14 +370,12 @@ class ProcessManager(object):
             raise ValueError("Sentence is not a string")
 
         context = {}
-        context["crs"] = 3857
+        context["crs"] = self.projection
 
         if location:
             context["location"] = location
 
         language_objects = self.fn_classify(sentence, context)
-
-        print(sentence)
 
         if "type" not in language_objects:
             logging.error("No type field in classification result")
@@ -390,10 +397,9 @@ class ProcessManager(object):
                 'error_message': 'No result in result'
             }
 
-        print(language_objects)
         lang_obj_result = language_objects["result"]
         semi_query = self.fn_identify_dataset(lang_obj_result, context)
-        print(semi_query)
+
         if "type" not in semi_query:
             logging.error("No type field in dataset result")
             return {
@@ -420,7 +426,7 @@ class ProcessManager(object):
             sq_result[1],
             context
         )
-        print(logical_sentence)
+
         if "type" not in logical_sentence:
             logging.error("No type field in dataset result")
             return {
